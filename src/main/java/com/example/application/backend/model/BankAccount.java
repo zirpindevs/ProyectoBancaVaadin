@@ -51,7 +51,6 @@ public class BankAccount {
     private List<User> users = new ArrayList<>();
 
     @OneToMany(mappedBy = "bankAccount", cascade = CascadeType.ALL)
-    @JsonIgnore
     @ApiModelProperty("List of transactions that a bank account has: List<Transaction>")
     private List<Transaction> transactions = new ArrayList<>();
 
