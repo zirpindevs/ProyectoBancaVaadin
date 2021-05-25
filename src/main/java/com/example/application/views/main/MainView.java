@@ -2,7 +2,6 @@ package com.example.application.views.main;
 
 import java.util.Optional;
 
-import com.example.application.security.SecurityConfiguration;
 import com.example.application.views.movimientos.MovimientosView;
 import com.example.application.views.tarjetas.TarjetasView;
 import com.vaadin.flow.component.Component;
