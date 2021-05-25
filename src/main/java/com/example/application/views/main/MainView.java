@@ -2,6 +2,7 @@ package com.example.application.views.main;
 
 import java.util.Optional;
 
+import com.example.application.security.SecurityConfiguration;
 import com.example.application.views.movimientos.MovimientosView;
 import com.example.application.views.tarjetas.TarjetasView;
 import com.vaadin.flow.component.Component;
@@ -9,6 +10,7 @@ import com.vaadin.flow.component.ComponentUtil;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.avatar.Avatar;
+import com.vaadin.flow.component.contextmenu.ContextMenu;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
@@ -51,7 +53,7 @@ public class MainView extends AppLayout {
         layout.add(new DrawerToggle());
         viewTitle = new H1();
         layout.add(viewTitle);
-        layout.add(new Avatar());
+        layout.add(createAvatarMenu());
         return layout;
     }
 
@@ -92,6 +94,27 @@ public class MainView extends AppLayout {
         ComponentUtil.setData(tab, Class.class, navigationTarget);
         return tab;
     }
+
+    private Component createAvatarMenu() {
+        // get security context
+        Avatar avatar = new Avatar();
+/*
+        avatar.setName(SecurityConfiguration.getUserDetails().getUsername());
+*/
+        avatar.setName("usuario");
+
+
+        ContextMenu contextMenu = new ContextMenu();
+        contextMenu.setOpenOnClick(true);
+        contextMenu.setTarget(avatar);
+
+        contextMenu.addItem("Logout", e -> {
+            contextMenu.getUI().ifPresent(ui -> ui.getPage().setLocation("/logout"));
+        });
+
+        return avatar;
+    }
+
 
     @Override
     protected void afterNavigation() {
