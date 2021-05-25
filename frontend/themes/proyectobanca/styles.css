@@ -1,0 +1,11 @@
+@import url('./views/main-view.css');
+@import url('./views/hello-world-view.css');
+@import url('./views/about-view.css');
+@import url('./views/card-list-view.css');
+@import url('./views/credit-card-form-view.css');
+@import url('lumo-css-framework/all-classes.css');    html {
+      --lumo-primary-color: hsl(343, 90%, 52%);
+      --lumo-primary-text-color: hsl(343, 90%, 52%);
+      --lumo-border-radius: calc(var(--lumo-size-m) / 2);
+
+    }
