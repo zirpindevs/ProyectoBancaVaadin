@@ -2,6 +2,7 @@ package com.example.application.views.main;
 
 import java.util.Optional;
 
+import com.example.application.views.chart.ChartView;
 import com.example.application.views.movimientos.MovimientosView;
 import com.example.application.views.tarjetas.TarjetasView;
 import com.vaadin.flow.component.Component;
@@ -84,7 +85,7 @@ public class MainView extends AppLayout {
     private Component[] createMenuItems() {
         return new Tab[]{createTab("Inicio", InicioView.class), createTab("Cuentas", CuentasView.class),
                 createTab("Tarjetas", TarjetasView.class), createTab("Movimientos", MovimientosView.class),
-                createTab("Credit Card Form", CreditCardFormView.class)};
+                createTab("Credit Card Form", CreditCardFormView.class), createTab("Graficas", ChartView.class)};
     }
 
     private static Tab createTab(String text, Class<? extends Component> navigationTarget) {
