@@ -1,25 +1,23 @@
-package com.example.application.views.helloworld;
+package com.example.application.views.cuentas;
 
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.PageTitle;
 import com.example.application.views.main.MainView;
 import com.vaadin.flow.router.RouteAlias;
 
-@Route(value = "hello", layout = MainView.class)
-@RouteAlias(value = "", layout = MainView.class)
-@PageTitle("Hello World")
-public class HelloWorldView extends HorizontalLayout {
+@Route(value = "cuentas", layout = MainView.class)
+@PageTitle("Cuentas")
+public class CuentasView extends HorizontalLayout {
 
     private TextField name;
     private Button sayHello;
 
-    public HelloWorldView() {
-        addClassName("hello-world-view");
+    public CuentasView() {
+        addClassName("cuentas-view");
         name = new TextField("Your name");
         sayHello = new Button("Say hello");
         add(name, sayHello);

@@ -2,6 +2,8 @@ package com.example.application.views.main;
 
 import java.util.Optional;
 
+import com.example.application.views.movimientos.MovimientosView;
+import com.example.application.views.tarjetas.TarjetasView;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentUtil;
 import com.vaadin.flow.component.applayout.AppLayout;
@@ -18,18 +20,15 @@ import com.vaadin.flow.component.tabs.TabsVariant;
 import com.vaadin.flow.router.RouterLink;
 import com.vaadin.flow.server.PWA;
 import com.vaadin.flow.theme.Theme;
-import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.PageTitle;
-import com.example.application.views.main.MainView;
-import com.example.application.views.helloworld.HelloWorldView;
-import com.example.application.views.about.AboutView;
-import com.example.application.views.cardlist.CardListView;
+import com.example.application.views.cuentas.CuentasView;
+import com.example.application.views.inicio.InicioView;
 import com.example.application.views.creditcardform.CreditCardFormView;
 
 /**
  * The main view is a top-level placeholder for other views.
  */
-@PWA(name = "ProyectoBanca", shortName = "ProyectoBanca", enableInstallPrompt = false)
+@PWA(name = "IngeniaBank", shortName = "IngeniaBank", enableInstallPrompt = false)
 @Theme(themeFolder = "proyectobanca")
 public class MainView extends AppLayout {
 
@@ -46,7 +45,6 @@ public class MainView extends AppLayout {
     private Component createHeaderContent() {
         HorizontalLayout layout = new HorizontalLayout();
         layout.setId("header");
-        layout.getThemeList().set("dark", true);
         layout.setWidthFull();
         layout.setSpacing(false);
         layout.setAlignItems(FlexComponent.Alignment.CENTER);
@@ -67,8 +65,8 @@ public class MainView extends AppLayout {
         HorizontalLayout logoLayout = new HorizontalLayout();
         logoLayout.setId("logo");
         logoLayout.setAlignItems(FlexComponent.Alignment.CENTER);
-        logoLayout.add(new Image("images/logo.png", "ProyectoBanca logo"));
-        logoLayout.add(new H1("ProyectoBanca"));
+        logoLayout.add(new Image("images/logo.png", ""));
+
         layout.add(logoLayout, menu);
         return layout;
     }
@@ -83,8 +81,9 @@ public class MainView extends AppLayout {
     }
 
     private Component[] createMenuItems() {
-        return new Tab[]{createTab("Hello World", HelloWorldView.class), createTab("About", AboutView.class),
-                createTab("Card List", CardListView.class), createTab("Credit Card Form", CreditCardFormView.class)};
+        return new Tab[]{createTab("Inicio", InicioView.class), createTab("Cuentas", CuentasView.class),
+                createTab("Tarjetas", TarjetasView.class), createTab("Movimientos", MovimientosView.class),
+                createTab("Credit Card Form", CreditCardFormView.class)};
     }
 
     private static Tab createTab(String text, Class<? extends Component> navigationTarget) {
