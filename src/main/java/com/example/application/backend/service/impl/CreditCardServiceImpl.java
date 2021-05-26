@@ -1,10 +1,7 @@
 package com.example.application.backend.service.impl;
 
 import com.example.application.backend.dao.CreditCardDAO;
-import com.example.application.backend.model.CreditCard;
-import com.example.application.backend.model.CreditCardDTO;
-import com.example.application.backend.model.CreditCardType;
-import com.example.application.backend.model.User;
+import com.example.application.backend.model.*;
 import com.example.application.backend.repository.CreditCardRepository;
 import com.example.application.backend.repository.UserRepository;
 import com.example.application.backend.service.CreditCardService;
@@ -46,6 +43,30 @@ public class CreditCardServiceImpl implements CreditCardService {
         if(id == null)
             return null;
         return this.creditCardDAO.findById(id);
+    }
+
+
+    /**
+     * Get user by ID - Service
+     * @param id Primary key of User: Long
+     * @return Optional<User> from database
+     */
+    @Override
+    public List<CreditCard> findbyUser(Long id) {
+        try {
+
+            List<CreditCard> creditCardDb = creditCardRepository.findByUserId(id);
+
+            return creditCardDb;
+
+        }catch (Exception e){
+
+            log.error(e.getMessage());
+            User creditCardError = new User();
+            creditCardError.setId(-500L);
+
+            return (List<CreditCard>) creditCardError;
+        }
     }
 
     /**

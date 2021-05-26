@@ -69,6 +69,28 @@ public class CreditCardController {
 
     }
 
+
+    /**
+     * Get all creditcards by user
+     * @param id user id of credit card: Long
+     * @return ResponseEntity<List<CreditCard>> from database
+     */
+    @GetMapping("/creditcards/user/{id}")
+    @ApiOperation("Get user by Id")
+    public ResponseEntity<List<CreditCard>> findOne(@ApiParam("user id of creditcard: Long") @PathVariable Long id){
+
+        if (id == null)
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
+        List<CreditCard> creditCardDB = creditCardService.findbyUser(id);
+
+
+        if (creditCardDB.isEmpty())
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
+        return ResponseEntity.ok().body(creditCardDB);
+    }
+
     /**
      * Create a new credit card in database
      * @param creditCardDTO CreditCardDTO to create

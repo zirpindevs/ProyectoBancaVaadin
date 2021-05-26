@@ -11,6 +11,8 @@ public interface CreditCardService {
 
     CreditCard findOne(Long id);
 
+    List<CreditCard> findbyUser(Long id);
+
     CreditCard createCreditCard(CreditCardDTO creditCardDTO);
 
     CreditCard updateCreditCard(Long id, CreditCardDTO creditCardDTO);

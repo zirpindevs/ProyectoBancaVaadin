@@ -5,6 +5,7 @@ import com.example.application.backend.model.MovimientoType;
 import com.example.application.backend.model.Transaction;
 import com.example.application.backend.model.TransactionDTO;
 import com.example.application.backend.model.transaction.operations.DailyBalanceResponse;
+import com.example.application.backend.model.transaction.operations.TransactionsCreditcardResponse;
 import com.example.application.backend.model.transaction.operations.TransactionsUserResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -145,4 +146,240 @@ public class TransactionDAOImpl implements TransactionDAO {
         return result;
 
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    /**************************************************************************************************/
+
+
+/*    @Override
+    public List<Transaction> findTransactionByCreditCardId(Long id, Map<String, String> map1){
+*//*
+        SELECT c.*, t.* from credit_cards c INNER JOIN transactions t on c.id = t.id WHERE c.created_at >now() - interval 1 month AND c.id_user = 1
+*//*
+        try {
+            Query queryNative = manager.createNativeQuery(
+                    "SELECT * FROM transactions" +
+                            " WHERE created_date >now() - interval 1 YEAR"
+                            + " AND id_credit_card = " + id
+            );
+            List result = queryNative.getResultList();
+
+
+            return result;
+
+        }catch (Exception e){
+            log.error(e.getMessage());
+            return new ArrayList<>();
+        }
+
+    }*/
+
+    @Override
+    public TransactionsCreditcardResponse findAllTransactionsByDateRangeByIdCreditcard(Long idCreditcard, Map<String, String> map1) {
+
+        try {
+
+            Query queryNative = manager.createNativeQuery(
+                    "SELECT * " +
+                            "FROM transactions " +
+                            "WHERE created_date BETWEEN '"
+                            + map1.get("startDate") + "'"
+                            + " AND '" + map1.get("endDate") + "'"
+                            + " AND id_credit_card = " + idCreditcard
+            );
+
+            List resultDB = queryNative.getResultList();
+
+            if (resultDB.size() == 0)
+                return new TransactionsCreditcardResponse("-204");
+
+            TransactionsCreditcardResponse result = mapoutToTransactionsCreditcardResponse(resultDB, idCreditcard, map1);
+
+
+            return result;
+
+
+        }catch (Exception e){
+            log.error(e.getMessage());
+            return new TransactionsCreditcardResponse("-500");
+        }
+
+
+    }
+
+    private TransactionsCreditcardResponse mapoutToTransactionsCreditcardResponse(List resultDB, Long idCreditcard, Map<String, String> map1){
+
+        TransactionsCreditcardResponse result = new TransactionsCreditcardResponse();
+
+        resultDB.forEach(
+                item -> {
+                    TransactionDTO transaction = new TransactionDTO();
+
+                    BigInteger idTransaction = (BigInteger) ((Object[]) item)[0];
+
+                    transaction.setId( idTransaction.longValue() );
+
+                    transaction.setBalanceAfterTransaction( (Double) ((Object[]) item)[1] );
+
+                    transaction.setConcepto( (String) ((Object[]) item)[2].toString() );
+
+                    Timestamp createdDate = (Timestamp) ((Object[]) item)[3];
+                    transaction.setCreatedDate(createdDate.toInstant());
+
+                    transaction.setImporte( (Double) ((Object[]) item)[4] );
+
+                    if (((Object[]) item)[5] != null) {
+                        Timestamp lasModified = (Timestamp) ((Object[]) item)[5];
+                        transaction.setLastModified(lasModified.toInstant());
+                    }
+
+                    String tipoMovimiento = (String) ((Object[]) item)[6].toString();
+                    transaction.setTipoMovimiento( MovimientoType.valueOf(tipoMovimiento) );
+
+
+                    BigInteger idBankAccount = (BigInteger) ((Object[]) item)[7];
+                    transaction.setIdBankAccount(idBankAccount.longValue());
+
+                    BigInteger idCategory = (BigInteger) ((Object[]) item)[9];
+                    transaction.setIdCategory(idCategory.longValue());
+
+                    if (((Object[]) item)[9] != null) {
+                        BigInteger idCreditCard = (BigInteger) ((Object[]) item)[9];
+                        transaction.setIdCreditCard(idCreditCard.longValue());
+                    }
+
+
+
+
+// t.last_modified, t.id_bank_account, t.id_credit_card, t.id_category
+                    result.getTransactions().add(transaction);
+                }
+        );
+
+
+
+        result.setStatus("200");
+        result.setIdUser(idCreditcard);
+        result.setStartDate(map1.get("startDate"));
+        result.setEndDate(map1.get("endDate"));
+
+
+        return result;
+
+    }
+
 }
