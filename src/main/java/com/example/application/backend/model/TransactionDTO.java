@@ -7,6 +7,9 @@ import java.time.Instant;
 public class TransactionDTO {
 
 
+    @ApiModelProperty("Transaction Id: Long")
+    private Long id;
+
     @ApiModelProperty("Transaction amount: Double")
     private Double importe;
 
@@ -37,7 +40,8 @@ public class TransactionDTO {
     public TransactionDTO() {
     }
 
-    public TransactionDTO(Double importe, Double balanceAfterTransaction, String concepto, MovimientoType tipoMovimiento, Instant createdDate, Instant lastModified, Long idBankAccount, Long idCreditCard, Long idCategory) {
+    public TransactionDTO(Long id, Double importe, Double balanceAfterTransaction, String concepto, MovimientoType tipoMovimiento, Instant createdDate, Instant lastModified, Long idBankAccount, Long idCreditCard, Long idCategory) {
+        this.id = id;
         this.importe = importe;
         this.balanceAfterTransaction = balanceAfterTransaction;
         this.concepto = concepto;
@@ -47,6 +51,14 @@ public class TransactionDTO {
         this.idBankAccount = idBankAccount;
         this.idCreditCard = idCreditCard;
         this.idCategory = idCategory;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public Double getImporte() {

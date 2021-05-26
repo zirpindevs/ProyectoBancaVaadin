@@ -2,6 +2,8 @@ package com.example.application.backend.service.impl;
 
 import com.example.application.backend.dao.TransactionDAO;
 import com.example.application.backend.model.*;
+import com.example.application.backend.model.transaction.operations.TransactionsUserResponse;
+import com.example.application.backend.model.transaction.operations.idbankaccountTransactions.TransactionsByBankAccountResponse;
 import com.example.application.backend.repository.BankAccountRepository;
 import com.example.application.backend.repository.CategoryRepository;
 import com.example.application.backend.repository.CreditCardRepository;
@@ -14,7 +16,9 @@ import org.springframework.util.ObjectUtils;
 
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -36,6 +40,50 @@ public class TransactionServiceImpl implements TransactionService {
         this.transactionDAO = transactionDAO;
     }
 
+
+    @Override
+    public List<Transaction> findAll() {
+        log.info("REST request to find all Transactions");
+
+        return this.transactionRepository.findAll();
+    }
+
+    @Override
+    public Transaction findOne(Long id) {
+        log.info("REST request to find one BankAccount by id");
+
+        if (id == null)
+            return null;
+        return this.transactionDAO.findById(id);
+    }
+
+    @Override
+    public TransactionsByBankAccountResponse findAllTransactionsByDateRangeByIdBankAccount(Long idBankAccount, Map<String, String> map1) {
+        return null;
+    }
+
+    /**
+     *
+     * @param idUser
+     * @param map1
+     * @return
+     */
+    @Override
+    public TransactionsUserResponse findAllTransactionsByDateRangeByIdUser(Long idUser, Map<String, String> map1) {
+        try {
+
+            if (map1.get("startDate") != null && map1.get("endDate") != null) {
+                return this.transactionDAO.findAllTransactionsByDateRangeByIdUser(idUser, map1);
+            }
+
+            return new TransactionsUserResponse("-404");
+
+        }catch (Exception e){
+
+            log.error(e.getMessage());
+            return new TransactionsUserResponse("-500");
+        }
+    }
 
     /**
      * Create a new transaction in database - Service
@@ -101,28 +149,13 @@ public class TransactionServiceImpl implements TransactionService {
 
 
     @Override
-    public List<Transaction> findAll() {
-        log.info("REST request to find all Transactions");
-
-        return this.transactionRepository.findAll();
-    }
-
-    @Override
-    public Transaction findOne(Long id) {
-        log.info("REST request to find one BankAccount by id");
-
-        if (id == null)
-            return null;
-        return this.transactionDAO.findById(id);
-    }
-
-
-    @Override
     public void deleteTransaction(Transaction transactionToDelete){
         log.info("REST request to delete an Transaction by id");
         this.transactionRepository.deleteById(transactionToDelete.getId());
 
-    } /**
+    }
+
+    /**
      * Validate a transaction before to save in db
      * @param transactionDTO
      * @return Transaction
@@ -234,7 +267,7 @@ public class TransactionServiceImpl implements TransactionService {
 
 
     /**
-     * Set de current balance in the BankAccounts and in Transaction before an operation
+     * Set the current balance in the BankAccounts and Transaction before an operation
      * @param transaction
      * @return Transaction
      */
