@@ -2,6 +2,7 @@ package com.example.application.backend.service.impl;
 
 import com.example.application.backend.dao.TransactionDAO;
 import com.example.application.backend.model.*;
+import com.example.application.backend.model.transaction.operations.TransactionsCreditcardResponse;
 import com.example.application.backend.model.transaction.operations.TransactionsUserResponse;
 import com.example.application.backend.model.transaction.operations.idbankaccountTransactions.TransactionsByBankAccountResponse;
 import com.example.application.backend.repository.BankAccountRepository;
@@ -294,5 +295,156 @@ public class TransactionServiceImpl implements TransactionService {
 
         return (movimientoType).equals(MovimientoType.PAGO) || movimientoType.equals(MovimientoType.RECIBO) || movimientoType.equals(MovimientoType.TRANSFERENCIA) || movimientoType.equals(MovimientoType.ABONO);
         }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    /****************************************************************************************************
+     *
+     *
+     *
+     *
+     *
+     */
+
+
+    /**
+     * Get transactions by creditcard ID - Service
+     * @param idCreditcard id creditcard id of transactions : Long
+     * @return List<Transaction> from database
+     */
+    @Override
+    public TransactionsCreditcardResponse findAllTransactionsByDateRangeByIdCreditcard(Long idCreditcard, Map<String, String> map1) {
+        try {
+
+            if (map1.get("startDate") != null && map1.get("endDate") != null) {
+                return this.transactionDAO.findAllTransactionsByDateRangeByIdCreditcard(idCreditcard, map1);
+            }
+
+            return new TransactionsCreditcardResponse("-404");
+
+        }catch (Exception e){
+
+            log.error(e.getMessage());
+            return new TransactionsCreditcardResponse("-500");
+        }
+    }
+
 
 }

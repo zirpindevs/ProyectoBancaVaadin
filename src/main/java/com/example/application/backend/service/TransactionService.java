@@ -2,6 +2,7 @@ package com.example.application.backend.service;
 
 import com.example.application.backend.model.Transaction;
 import com.example.application.backend.model.TransactionDTO;
+import com.example.application.backend.model.transaction.operations.TransactionsCreditcardResponse;
 import com.example.application.backend.model.transaction.operations.TransactionsUserResponse;
 import com.example.application.backend.model.transaction.operations.idbankaccountTransactions.TransactionsByBankAccountResponse;
 
@@ -24,4 +25,8 @@ public interface TransactionService {
 
     void deleteTransaction(Transaction transactionToDelete);
 
-}
+
+    TransactionsCreditcardResponse findAllTransactionsByDateRangeByIdCreditcard(Long idCreditcard, Map<String, String> map1);
+
+
+    }
