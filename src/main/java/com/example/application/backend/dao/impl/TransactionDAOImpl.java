@@ -1,12 +1,11 @@
 package com.example.application.backend.dao.impl;
 
 import com.example.application.backend.dao.TransactionDAO;
-import com.example.application.backend.model.MovimientoType;
-import com.example.application.backend.model.Transaction;
-import com.example.application.backend.model.TransactionDTO;
-import com.example.application.backend.model.transaction.operations.DailyBalanceResponse;
+import com.example.application.backend.model.*;
 import com.example.application.backend.model.transaction.operations.TransactionsCreditcardResponse;
 import com.example.application.backend.model.transaction.operations.TransactionsUserResponse;
+import com.example.application.backend.service.BankAccountService;
+import com.example.application.backend.service.CreditCardService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
@@ -19,8 +18,6 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import java.math.BigInteger;
 import java.sql.Timestamp;
-import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -31,6 +28,16 @@ public class TransactionDAOImpl implements TransactionDAO {
     private EntityManager manager;
 
     private final Logger log = LoggerFactory.getLogger(TransactionDAOImpl.class);
+
+    private final BankAccountService bankAccountService;
+
+    private final CreditCardService creditCardService;
+
+    public TransactionDAOImpl(BankAccountService bankAccountService, CreditCardService creditCardService) {
+        this.bankAccountService = bankAccountService;
+        this.creditCardService = creditCardService;
+    }
+
 
     @Override
     public Transaction findById(Long id){
@@ -91,7 +98,7 @@ public class TransactionDAOImpl implements TransactionDAO {
 
         resultDB.forEach(
             item -> {
-                TransactionDTO transaction = new TransactionDTO();
+                TransactionGrid transaction = new TransactionGrid();
 
                 BigInteger idTransaction = (BigInteger) ((Object[]) item)[0];
 
@@ -115,14 +122,18 @@ public class TransactionDAOImpl implements TransactionDAO {
                     transaction.setLastModified(lasModified.toInstant());
                 }
 
-
                 BigInteger idBankAccount = (BigInteger) ((Object[]) item)[7];
-
                 transaction.setIdBankAccount(idBankAccount.longValue());
+                String numBankAccount = this.bankAccountService.findOne(idBankAccount.longValue()).get().getNumAccount();
+                transaction.setNumBankAccount(numBankAccount);
+               // String numCuenta = bankAccount.getNumAccount();
 
                 if (((Object[]) item)[8] != null) {
                     BigInteger idCreditCard = (BigInteger) ((Object[]) item)[8];
                     transaction.setIdCreditCard(idCreditCard.longValue());
+
+                    String numCreditCard = this.creditCardService.findOne(idCreditCard.longValue()).getNumCreditCard();
+                    transaction.setNumCreditCard(numCreditCard);
                 }
 
 

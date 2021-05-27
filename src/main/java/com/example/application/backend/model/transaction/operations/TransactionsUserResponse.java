@@ -2,6 +2,7 @@ package com.example.application.backend.model.transaction.operations;
 
 import com.example.application.backend.model.Transaction;
 import com.example.application.backend.model.TransactionDTO;
+import com.example.application.backend.model.TransactionGrid;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +17,7 @@ public class TransactionsUserResponse {
 
     private Long idUser;
 
-    private List<TransactionDTO> transactions = new ArrayList<>();
+    private List<TransactionGrid> transactions = new ArrayList<>();
 
     public TransactionsUserResponse() {
     }
@@ -57,21 +58,11 @@ public class TransactionsUserResponse {
         this.idUser = idUser;
     }
 
-    public List<TransactionDTO> getTransactions() {
+    public List<TransactionGrid> getTransactions() {
         return transactions;
     }
 
-    public void setTransactions(List<TransactionDTO> transactions) {
+    public void setTransactions(List<TransactionGrid> transactions) {
         this.transactions = transactions;
-    }
-
-    @Override
-    public String toString() {
-        return "TransactionsUserResponse{" +
-                "status='" + status + '\'' +
-                ", startDate='" + startDate + '\'' +
-                ", endDate='" + endDate + '\'' +
-                ", idUser=" + idUser +
-                '}';
     }
 }

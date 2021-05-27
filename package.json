@@ -48,7 +48,10 @@
     "@webcomponents/webcomponentsjs": "^2.2.10",
     "lit-element": "2.5.1",
     "lit-html": "1.4.1",
-    "lumo-css-framework": "^3.0.11"
+    "lumo-css-framework": "^3.0.11",
+    "apexcharts": "3.25.0",
+    "onecolor": "3.1.0",
+    "@polymer/paper-ripple": "3.0.2"
   },
   "devDependencies": {
     "chokidar": "^3.5.0",
@@ -116,7 +119,10 @@
       "@vaadin/vaadin-material-styles": "1.3.2",
       "@vaadin/vaadin-rich-text-editor": "1.3.0",
       "@vaadin/vaadin-avatar": "1.0.4",
-      "lit-html": "1.4.1"
+      "lit-html": "1.4.1",
+      "apexcharts": "3.25.0",
+      "onecolor": "3.1.0",
+      "@polymer/paper-ripple": "3.0.2"
     },
     "devDependencies": {
       "webpack-babel-multi-target-plugin": "2.3.3",
@@ -137,6 +143,6 @@
       "construct-style-sheets-polyfill": "2.4.6",
       "extract-loader": "5.1.0"
     },
-    "hash": "ee41b5f52358e5c90c5655e40455b1079f03fbbe0075fde5599b7e3db140dbe6"
+    "hash": "c6bee65d843ef62e311c7d69cc162f71684e88e1a5416843c20b722ec391bac2"
   }
 }
