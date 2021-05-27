@@ -12,10 +12,12 @@ import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H3;
+import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.textfield.PasswordField;
+import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
@@ -26,7 +28,7 @@ public class CreditCardForm extends Dialog {
 
     private CreditCard creditCard;
 
-    private TextField cardNumber = new TextField("Numbero de Tarjeta");
+    private TextField  cardNumber = new TextField("Numbero de Tarjeta");
     private TextField cardholderName = new TextField("Name de la tarjeta");
     private TextField creditCardType = new TextField("Tipo de tarjeta");
     private TextField card_provider = new TextField("Proovedor de Tarjeta");
@@ -69,14 +71,29 @@ public class CreditCardForm extends Dialog {
     private Component createButtonLayout(CreditCard creditCard) {
         HorizontalLayout buttonLayout = new HorizontalLayout();
         buttonLayout.addClassName("button-layout");
-        cardNumber.setPlaceholder(creditCard.getNumCreditCard().toString());
-        cardholderName.setPlaceholder(creditCard.getPlaceholder().toString());
-        creditCardType.setPlaceholder(creditCard.getType().toString());
-        card_provider.setPlaceholder(creditCard.getCardProvider().toString());
-        pin.setPlaceholder(creditCard.getPin().toString());
-        cvv.setPlaceholder(creditCard.getCvv().toString());
 
-        dateField.setPlaceholder(creditCard.getExpirationDate().toString());
+        cardNumber.setValue(creditCard.getNumCreditCard().toString());
+        cardNumber.setReadOnly(true);
+
+        cardholderName.setValue(creditCard.getPlaceholder().toString());
+        cardholderName.setReadOnly(true);
+
+        creditCardType.setValue(creditCard.getType().toString());
+        creditCardType.setReadOnly(true);
+
+        card_provider.setValue(creditCard.getCardProvider().toString());
+        card_provider.setReadOnly(true);
+
+        pin.setValue(creditCard.getPin().toString());
+        pin.setReadOnly(true);
+
+        cvv.setValue(creditCard.getCvv().toString());
+        cvv.setReadOnly(true);
+
+
+        dateField.setValue(creditCard.getExpirationDate().toString());
+        dateField.setReadOnly(true);
+
         Salir.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
         buttonLayout.add(Salir);
