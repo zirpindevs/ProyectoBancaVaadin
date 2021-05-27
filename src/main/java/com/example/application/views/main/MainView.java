@@ -13,6 +13,8 @@ import com.vaadin.flow.component.avatar.Avatar;
 import com.vaadin.flow.component.contextmenu.ContextMenu;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.H1;
+import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -92,8 +94,9 @@ public class MainView extends AppLayout {
 
     private static Tab createTab(String text, Class<? extends Component> navigationTarget) {
         final Tab tab = new Tab();
+
         if(text.equals("Inicio"))
-            tab.add(new Image("/images/menu/home.png",""));
+            tab.add(new Icon(VaadinIcon.HOME));
         if(text.equals("Cuentas"))
             tab.add(new Image("/images/menu/group.png",""));
         if(text.equals("Tarjetas"))
