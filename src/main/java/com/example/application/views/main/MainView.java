@@ -82,13 +82,27 @@ public class MainView extends AppLayout {
     }
 
     private Component[] createMenuItems() {
-        return new Tab[]{createTab("Inicio", InicioView.class), createTab("Cuentas", CuentasView.class),
-                createTab("Tarjetas", TarjetasView.class), createTab("Movimientos", MovimientosView.class),
+        return new Tab[]{
+                createTab("Inicio", InicioView.class),
+                createTab("Cuentas", CuentasView.class),
+                createTab("Tarjetas", TarjetasView.class),
+                createTab("Movimientos", MovimientosView.class),
                 createTab("Graficas", ChartView.class)};
     }
 
     private static Tab createTab(String text, Class<? extends Component> navigationTarget) {
         final Tab tab = new Tab();
+        if(text.equals("Inicio"))
+            tab.add(new Image("/images/menu/home.png",""));
+        if(text.equals("Cuentas"))
+            tab.add(new Image("/images/menu/group.png",""));
+        if(text.equals("Tarjetas"))
+            tab.add(new Image("/images/menu/tarjetas.png",""));
+        if(text.equals("Movimientos"))
+            tab.add(new Image("/images/menu/transfer.png",""));
+        if(text.equals("Graficas"))
+            tab.add(new Image("/images/menu/balance.png",""));
+
         tab.add(new RouterLink(text, navigationTarget));
         ComponentUtil.setData(tab, Class.class, navigationTarget);
         return tab;
