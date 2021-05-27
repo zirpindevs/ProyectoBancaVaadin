@@ -1,6 +1,7 @@
 package com.example.application.views.movimientos;
 
 import com.example.application.backend.model.BankAccount;
+import com.example.application.backend.model.Transaction;
 import com.example.application.backend.model.TransactionDTO;
 import com.example.application.backend.model.TransactionGrid;
 import com.example.application.backend.model.transaction.operations.TransactionsUserResponse;
@@ -12,8 +13,10 @@ import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
+import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.router.PageTitle;
@@ -49,7 +52,9 @@ public class MovimientosView extends HorizontalLayout {
 
         addClassName("transactions-view");
 
-        this.setSizeFull();
+        this.setWidth("90%");
+        this.setHeightFull();
+        this.setAlignSelf(Alignment.CENTER);
         this.setPadding(true);
 
         // load data from service
@@ -106,20 +111,24 @@ public class MovimientosView extends HorizontalLayout {
     private void configureGrid() {
         loadGrid();
 
-        gridTransactions.setWidth("90%");
-        gridTransactions.setColumns("numBankAccount", "concepto");
-       // value = CustomizableGrid.this.toString(getContainerDataSource().getItem(editedItemId).getItemProperty(columnName).getValue());
+        gridTransactions.setWidth("80%");
+        gridTransactions.setColumns();
 
-       /* gridTransactions.addColumn("idBankAccount").setHeader("Cuenta / Tarjeta");
-        gridTransactions.setColumns("idBankAccount")
 
-*/
+        gridTransactions.addComponentColumn(
+                item -> printTransactionIcon(gridTransactions, item)
+        ).setFlexGrow(0).setWidth("200px").setTextAlign(ColumnTextAlign.START).setHeader("");
 
-        gridTransactions.getColumnByKey("numBankAccount").setFlexGrow(0).setWidth("20%").setHeader("Cuenta / Tarjeta");
-       // gridTransactions.getColumnByKey("importe").setFlexGrow(0).setHeader("Importe");
-        gridTransactions.addComponentColumn(item ->new Label(item.getImporte().toString() + " €")).setFlexGrow(0).setWidth("10%").setSortable(true).setHeader("Importe");
+        gridTransactions.addComponentColumn(item ->new Text(item.getNumBankAccount())).setFlexGrow(0).setWidth("12%").setTextAlign(ColumnTextAlign.START).setHeader("Cuenta / Tarjeta");
 
-        gridTransactions.getColumnByKey("concepto").setFlexGrow(1).setHeader("Concepto");
+        gridTransactions.addComponentColumn(item ->new Label(item.getImporte().toString() + " €")).setFlexGrow(0).setWidth("15%").setTextAlign(ColumnTextAlign.END).setHeader("Importe");
+
+        gridTransactions.addComponentColumn(item ->new Text(item.getConcepto())).setFlexGrow(1).setHeader("Concepto");
+
+
+
+
+       // gridTransactions.getColumnByKey("concepto").setFlexGrow(1).setHeader("Concepto");
         gridTransactions.addComponentColumn(item ->new Label(
                 item.getCreatedDate().toString().substring(8,10) + "/" +
                     item.getCreatedDate().toString().substring(6,7) + "/" +
@@ -137,6 +146,17 @@ public class MovimientosView extends HorizontalLayout {
                 GridVariant.LUMO_ROW_STRIPES);
     }
 
+    private Image printTransactionIcon(Grid<TransactionGrid> gridTransactions, TransactionGrid transaction){
+        Image icon = new Image();
+        if(transaction.getTipoMovimiento().name().equals("PAGO") || transaction.getTipoMovimiento().name().equals("RECIBO")){
+            icon.setSrc("/images/icon-rojo.png");
+        }else{
+            icon.setSrc("/images/icon-verde.png");
+        }
+
+        return icon;
+    }
+
 
     private String maskNumber(String number){
         return "**** " + number.substring(number.length() - 4);
@@ -151,7 +171,8 @@ public class MovimientosView extends HorizontalLayout {
 
     private void createViewLayout() {
 
-        gridTransactions.setSizeFull();
+        gridTransactions.setWidth("80%");
+        gridTransactions.setHeightFull();
 
         add(gridTransactions);
     }
