@@ -3,6 +3,9 @@ package com.example.application.backend.service.impl;
 import com.example.application.backend.dao.BankAccountDAO;
 import com.example.application.backend.model.BankAccount;
 import com.example.application.backend.model.BankAccountDTO;
+import com.example.application.backend.model.CreditCard;
+import com.example.application.backend.model.bankaccount.operations.BankAccountUserResponse;
+import com.example.application.backend.model.transaction.operations.TransactionsUserResponse;
 import com.example.application.backend.repository.BankAccountRepository;
 import com.example.application.backend.service.BankAccountService;
 import org.slf4j.Logger;
@@ -248,5 +251,25 @@ public class BankAccountServiceImpl implements BankAccountService {
         bankAccountDB.get().setUpdatedAt(LocalDateTime.now());
 
         return bankAccountDB.get();
+    }
+
+    @Override
+    public BankAccountUserResponse findAllBankAccountsByIdUser(Long idUser) {
+
+        try {
+
+            if (idUser != null) {
+                return this.bankAccountDAO.findAllBankAccountsByIdUser(idUser);
+
+            }
+
+            return new BankAccountUserResponse("-404");
+
+        }catch (Exception e){
+
+            log.error(e.getMessage());
+            return new BankAccountUserResponse("-500");
+
+        }
     }
 }

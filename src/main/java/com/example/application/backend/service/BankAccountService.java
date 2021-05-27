@@ -2,6 +2,7 @@ package com.example.application.backend.service;
 
 import com.example.application.backend.model.BankAccount;
 import com.example.application.backend.model.BankAccountDTO;
+import com.example.application.backend.model.bankaccount.operations.BankAccountUserResponse;
 
 import java.util.List;
 import java.util.Map;
@@ -18,5 +19,7 @@ public interface BankAccountService {
     BankAccount updateOne(Long id, BankAccountDTO bankAccountDTO);
 
     Optional<Boolean> deleteOne(Long id);
+
+    BankAccountUserResponse findAllBankAccountsByIdUser(Long idUser);
 
 }

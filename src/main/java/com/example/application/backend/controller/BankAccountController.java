@@ -2,6 +2,8 @@ package com.example.application.backend.controller;
 
 import com.example.application.backend.model.BankAccount;
 import com.example.application.backend.model.BankAccountDTO;
+import com.example.application.backend.model.bankaccount.operations.BankAccountUserResponse;
+import com.example.application.backend.model.transaction.operations.TransactionsCreditcardResponse;
 import com.example.application.backend.repository.BankAccountRepository;
 import com.example.application.backend.service.BankAccountService;
 
@@ -158,4 +160,34 @@ public class BankAccountController {
         return ResponseEntity.ok().build();
     }
 
-}
+
+
+        /**
+         * Get bank account by ID
+         * @param id Primary key of Bank Account: Long
+         * @return Bank account from database
+         */
+        @GetMapping("/bankaccounts/user/{id}")
+        @ApiOperation("Get bank account by userId")
+        public ResponseEntity<BankAccountUserResponse> findOneByUser(@ApiParam("key of user id: Long") @PathVariable Long id){
+
+            if (id == null)
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
+
+            BankAccountUserResponse result = bankAccountService.findAllBankAccountsByIdUser(id);
+
+
+            if (result.getStatus() == "-404")
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
+            if (result.getStatus() == "-500")
+                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+
+            if (result.getStatus() == "-204")
+                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+
+            return ResponseEntity.ok().body(result);
+        }
+
+    }

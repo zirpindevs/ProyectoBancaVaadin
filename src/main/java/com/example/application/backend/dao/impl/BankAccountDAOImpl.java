@@ -1,17 +1,23 @@
 package com.example.application.backend.dao.impl;
 
 import com.example.application.backend.dao.BankAccountDAO;
-import com.example.application.backend.model.BankAccount;
+import com.example.application.backend.model.*;
+import com.example.application.backend.model.bankaccount.operations.BankAccountUserResponse;
+import com.example.application.backend.model.transaction.operations.TransactionsCreditcardResponse;
+import com.example.application.backend.model.transaction.operations.TransactionsUserResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
+import java.math.BigInteger;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -79,4 +85,69 @@ public class BankAccountDAOImpl implements BankAccountDAO {
         return bankAccount;
     }
 
+    @Override
+    public BankAccountUserResponse findAllBankAccountsByIdUser(Long idUser) {
+/*
+    select * from bank_accounts ba INNER JOIN users_bank_accounts uba on uba.bank_account_id = ba.id WHERE uba.user_id = 1
+*/
+        try {
+
+            Query queryNative = manager.createNativeQuery(
+                    "select * from bank_accounts ba INNER JOIN users_bank_accounts uba on uba.bank_account_id = ba.id WHERE"
+                               + " uba.user_id = " + idUser
+            );
+
+            List resultDB = queryNative.getResultList();
+
+
+            if (resultDB.size() == 0)
+                return new BankAccountUserResponse("-204");
+
+
+                BankAccountUserResponse result = mapoutToBankAccountByUserResponse(resultDB);
+
+            return result;
+
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return new BankAccountUserResponse("-500");
+
+        }
+    }
+
+
+    private BankAccountUserResponse mapoutToBankAccountByUserResponse(List resultDB){
+
+        BankAccountUserResponse result = new BankAccountUserResponse();
+
+        resultDB.forEach(
+                item -> {
+                    BankAccount bankAccount = new BankAccount();
+
+                    BigInteger idBankAccount = (BigInteger) ((Object[]) item)[0];
+
+                    bankAccount.setId( idBankAccount.longValue() );
+
+                    bankAccount.setBalance( (Double) ((Object[]) item)[1] );
+
+                    Timestamp createdDate = (Timestamp) ((Object[]) item)[2];
+                    bankAccount.setCreatedAt(createdDate.toLocalDateTime());
+
+                    bankAccount.setDeleted( (Boolean) ((Object[]) item)[3] );
+                    bankAccount.setEnabled( (Boolean) ((Object[]) item)[4] );
+
+                    if (((Object[]) item)[5] != null)
+                        bankAccount.setNumAccount( (String) ((Object[]) item)[5] );
+
+                    result.getBankAccounts().add(bankAccount);
+
+                }
+        );
+
+
+        result.setStatus("200");
+
+        return result;
+
+    }
 }
