@@ -9,6 +9,7 @@ import com.example.application.backend.service.CreditCardService;
 import com.example.application.backend.service.TransactionService;
 import com.example.application.backend.service.UserService;
 import com.example.application.views.main.MainView;
+import com.example.application.views.tarjetas.form.CreditCardForm;
 import com.github.appreciated.card.Card;
 import com.github.appreciated.card.action.ActionButton;
 import com.github.appreciated.card.action.Actions;
@@ -17,8 +18,9 @@ import com.github.appreciated.card.label.PrimaryLabel;
 import com.github.appreciated.card.label.SecondaryLabel;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.html.Image;
-import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.data.binder.BeanValidationBinder;
+import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import org.slf4j.Logger;
@@ -27,15 +29,14 @@ import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.BinaryOperator;
-import java.util.function.IntBinaryOperator;
 
 @Route(value = "tarjetas", layout = MainView.class)
 @PageTitle("Tarjetas")
 public class TarjetasView extends HorizontalLayout {
 
     Logger logger = LoggerFactory.getLogger(this.getClass());
+    private static final int NOTIFICATION_DEFAULT_DURATION = 5000;
+
     private UserService userService;
     private CreditCardService creditCardService;
     private TransactionService transactionService;
@@ -49,6 +50,7 @@ public class TarjetasView extends HorizontalLayout {
 
 
     User miUser = new User();
+    private Binder<CreditCard> creditCardBinder = new BeanValidationBinder<CreditCard>(CreditCard.class);;
 
 
     public TarjetasView(UserService userService, CreditCardService creditCardService, TransactionService transactionService) {
@@ -63,7 +65,7 @@ public class TarjetasView extends HorizontalLayout {
 
 
         //pinta cada creditcard que tenga el usuario
-        creditCards.forEach(creditCard -> add(cardGenerator(creditCard.getId(), creditCard.getNumCreditCard(), creditCard.getCardProvider())));
+        creditCards.forEach(creditCard -> add(cardGenerator(creditCard.getId(), creditCard.getNumCreditCard(), creditCard.getCardProvider(), creditCard)));
 
     }
 
@@ -92,7 +94,7 @@ public class TarjetasView extends HorizontalLayout {
     }
 
 
-    public Component cardGenerator(Long idCreditCard, String numCreditCard, String cardProvider) {
+    public Component cardGenerator(Long idCreditCard, String numCreditCard, String cardProvider, CreditCard creditCard) {
 
         String maskedNumbers = maskCardNumber(numCreditCard);
         HorizontalLayout cardLayout = new HorizontalLayout();
@@ -112,12 +114,12 @@ public class TarjetasView extends HorizontalLayout {
 
         List<TransactionDTO> transactionsTarjetas = balanceTarjeta.getTransactions();
 
-        Double saltoTarjeta = 0D;
+        Double saldoTarjeta = 0D;
 
         for(int x=0; x<transactionsTarjetas.size();x++) {
 
             if(transactionsTarjetas.get(x).getTipoMovimiento().name().equals("PAGO") || transactionsTarjetas.get(x).getTipoMovimiento().name().equals("RECIBO"))
-                saltoTarjeta = saltoTarjeta + transactionsTarjetas.get(x).getImporte();
+                saldoTarjeta = saldoTarjeta + transactionsTarjetas.get(x).getImporte();
         }
 
 
@@ -126,12 +128,17 @@ public class TarjetasView extends HorizontalLayout {
         Card card = new Card(
                     // if you don't want the title to wrap you can set the whitespace = nowrap
                     logoBanco,
-                    new PrimaryLabel(saltoTarjeta.toString()+" €"),
+                    new PrimaryLabel(saldoTarjeta.toString()+" €"),
                     new SecondaryLabel(maskedNumbers),
                     new IconItem(getIcon(cardProvider), ""),
                     new Actions(
                             new ActionButton("Ver detalles", event -> {
 
+                                CreditCardForm creditCardForm = new CreditCardForm(creditCard);
+
+
+                                // open form dialog view
+                                creditCardForm.open();
                             })
                     )
             );
