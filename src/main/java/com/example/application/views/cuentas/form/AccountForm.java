@@ -4,6 +4,7 @@ import com.example.application.backend.model.*;
 import com.example.application.backend.service.TransactionService;
 import com.example.application.views.main.MainView;
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
@@ -73,6 +74,8 @@ public class AccountForm extends Dialog {
             try {
                 if(createTransaction()) {
                     Notification.show("Transferencia realizada");
+                    UI.getCurrent().getPage().reload();
+
                 }
                 else {
                     Notification.show("Error en la transferencia");

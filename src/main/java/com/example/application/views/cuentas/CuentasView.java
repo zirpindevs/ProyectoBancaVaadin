@@ -152,9 +152,6 @@ public class CuentasView extends HorizontalLayout {
 
                             // open form dialog view
                             accountForm.open();
-/*TODO
-ACTUALIZAR SALDO DE LA CUENTA
- */
                             })
 
                 ),
