@@ -5,10 +5,7 @@ import com.example.application.backend.model.*;
 import com.example.application.backend.model.transaction.operations.TransactionsCreditcardResponse;
 import com.example.application.backend.model.transaction.operations.TransactionsUserResponse;
 import com.example.application.backend.model.transaction.operations.idbankaccountTransactions.TransactionsByBankAccountResponse;
-import com.example.application.backend.repository.BankAccountRepository;
-import com.example.application.backend.repository.CategoryRepository;
-import com.example.application.backend.repository.CreditCardRepository;
-import com.example.application.backend.repository.TransactionRepository;
+import com.example.application.backend.repository.*;
 import com.example.application.backend.service.TransactionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,14 +27,16 @@ public class TransactionServiceImpl implements TransactionService {
     private final BankAccountRepository bankAccountRepository;
     private final CategoryRepository categoryRepository;
     private final CreditCardRepository creditCardRepository;
+    private final UserRepository userRepository;
 
     private final TransactionDAO transactionDAO;
 
-    public TransactionServiceImpl(TransactionRepository transactionRepository, BankAccountRepository bankAccountRepository, CategoryRepository categoryRepository, CreditCardRepository creditCardRepository, TransactionDAO transactionDAO) {
+    public TransactionServiceImpl(TransactionRepository transactionRepository, BankAccountRepository bankAccountRepository, CategoryRepository categoryRepository, CreditCardRepository creditCardRepository, UserRepository userRepository, TransactionDAO transactionDAO) {
         this.transactionRepository = transactionRepository;
         this.bankAccountRepository = bankAccountRepository;
         this.categoryRepository = categoryRepository;
         this.creditCardRepository = creditCardRepository;
+        this.userRepository = userRepository;
         this.transactionDAO = transactionDAO;
     }
 
@@ -99,8 +98,8 @@ public class TransactionServiceImpl implements TransactionService {
 
         try{
 
-        transactionDTO.setCreatedDate(Instant.now());
-        transactionDTO.setLastModified(Instant.now());
+            transactionValidated.setCreatedDate(Timestamp.from(Instant.now()));
+            transactionValidated.setLastModified(Instant.now());
 
             return transactionRepository.save(transactionValidated);
 
@@ -112,6 +111,11 @@ public class TransactionServiceImpl implements TransactionService {
 
             return transactiondError;        }
 
+    }
+
+    @Override
+    public Transaction createTransactionForm(TransactionDTO transactionDTO) {
+        return  this.createTransaction(transactionDTO);
     }
 
 
@@ -157,6 +161,36 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     /**
+     * Create a new transaction in database - Service
+     * @param transactionDTO to update
+     * @return Transaction created in database
+     */
+    @Override
+    public Boolean createTransactionVaadin(TransactionDTO transactionDTO) {
+        log.debug("Create Transaction: {}", transactionDTO);
+
+/*
+        Transaction transactionValidated = createValidateTransaction(transactionDTO);
+*/
+
+        try{
+
+         /*   transactionValidated.setCreatedDate(Timestamp.from(Instant.now()));
+            transactionValidated.setLastModified(Instant.now());*/
+
+            BankAccount bankAccount = new BankAccount();
+            bankAccount = bankAccountRepository.findById(transactionDTO.getIdBankAccount()).get();
+
+            return transactionDAO.insertNewTransactionAndUpdateBalance(transactionDTO, bankAccount);
+
+        }catch(Exception e) {
+            log.error(e.getMessage());
+            e.printStackTrace();
+            return false;        }
+
+    }
+
+    /**
      * Validate a transaction before to save in db
      * @param transactionDTO
      * @return Transaction
@@ -183,9 +217,10 @@ public class TransactionServiceImpl implements TransactionService {
             transaction.setCreatedDate(Timestamp.from(Instant.now()));
 
             if (transactionDTO.getIdBankAccount() != null) {
-                Optional<BankAccount> bankAccount = bankAccountRepository.findOneById(transactionDTO.getIdBankAccount());
+                Optional<BankAccount> bankAccount = bankAccountRepository.findById(transactionDTO.getIdBankAccount());
                 transaction.setBankAccount(bankAccount.get());
             }
+
             if (transactionDTO.getIdCategory() != null) {
                 Optional<Category> category = categoryRepository.findOneById(transactionDTO.getIdCategory());
                 transaction.setCategory(category.get());
