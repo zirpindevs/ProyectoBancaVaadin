@@ -16,8 +16,10 @@ import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
+import javax.transaction.Transactional;
 import java.math.BigInteger;
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 
@@ -26,6 +28,7 @@ public class TransactionDAOImpl implements TransactionDAO {
 
     @PersistenceContext
     private EntityManager manager;
+
 
     private final Logger log = LoggerFactory.getLogger(TransactionDAOImpl.class);
 
@@ -365,9 +368,6 @@ public class TransactionDAOImpl implements TransactionDAO {
                     BigInteger idBankAccount = (BigInteger) ((Object[]) item)[7];
                     transaction.setIdBankAccount(idBankAccount.longValue());
 
-                    BigInteger idCategory = (BigInteger) ((Object[]) item)[9];
-                    transaction.setIdCategory(idCategory.longValue());
-
                     if (((Object[]) item)[9] != null) {
                         BigInteger idCreditCard = (BigInteger) ((Object[]) item)[9];
                         transaction.setIdCreditCard(idCreditCard.longValue());
@@ -390,6 +390,49 @@ public class TransactionDAOImpl implements TransactionDAO {
 
 
         return result;
+
+    }
+
+    @Override
+    @Transactional
+    public Boolean insertNewTransactionAndUpdateBalance(TransactionDTO transactionDTO, BankAccount bankAccount) {
+       Double balance_after_transaction = bankAccount.getBalance() - transactionDTO.getImporte();
+/*
+        transaction.getBankAccount().setBalance(transaction.getBankAccount().getBalance() + transaction.getImporte());
+
+            transaction.setBalanceAfterTransaction(transaction.getBankAccount().getBalance());*/
+
+
+
+        Timestamp date= Timestamp.from(Instant.now());
+
+        TransactionDTO transactionError = new TransactionDTO();
+        try {
+
+            manager.createNativeQuery("INSERT INTO transactions (concepto, created_date, importe, tipo_movimiento, id_bank_account, balance_after_transaction) VALUES (?,?,?,?,?,?)")
+                    .setParameter(1, transactionDTO.getConcepto())
+                    .setParameter(2, date)
+                    .setParameter(3, transactionDTO.getImporte())
+                    .setParameter(4, "TRANSFERENCIA")
+                    .setParameter(5,transactionDTO.getIdBankAccount())
+                    .setParameter(6, balance_after_transaction)
+
+                    .executeUpdate();
+
+
+             manager.createNativeQuery("UPDATE bank_accounts SET balance = " + balance_after_transaction +
+                                        " WHERE id = "+ transactionDTO.getIdBankAccount())
+                    .executeUpdate();
+
+
+            return true;
+
+
+        }catch (Exception e){
+            log.error(e.getMessage());
+            return false;
+
+        }
 
     }
 

@@ -40,6 +40,7 @@ import java.util.Map;
 @PageTitle("Cuentas")
 public class CuentasView extends HorizontalLayout {
 
+    private static Long TEST_USER = 1L;
 
     Logger logger = LoggerFactory.getLogger(this.getClass());
     private static final int NOTIFICATION_DEFAULT_DURATION = 5000;
@@ -87,7 +88,7 @@ public class CuentasView extends HorizontalLayout {
         map1.put("limit", "50");
 
         try {
-            this.bankAccountUserResponse = bankAccountService.findAllBankAccountsByIdUser(1L);
+            this.bankAccountUserResponse = bankAccountService.findAllBankAccountsByIdUser(TEST_USER);
             this.bankAccounts = this.bankAccountUserResponse.getBankAccounts();
 
 //            for (int i = 0; i < this.transactions.size(); i++){
@@ -146,12 +147,15 @@ public class CuentasView extends HorizontalLayout {
                 new Actions(
                         new ActionButton("Transferencias", event -> {
 
-                            AccountForm accountForm = new AccountForm(bankAccount, transactionService);
+                            AccountForm accountForm = new AccountForm(bankAccount, transactionService, TEST_USER);
 
 
                             // open form dialog view
                             accountForm.open();
-                        })
+/*TODO
+ACTUALIZAR SALDO DE LA CUENTA
+ */
+                            })
 
                 ),
                 new Actions(

@@ -29,4 +29,9 @@ public interface TransactionService {
     TransactionsCreditcardResponse findAllTransactionsByDateRangeByIdCreditcard(Long idCreditcard, Map<String, String> map1);
 
 
+    Transaction createTransactionForm(TransactionDTO transactionDTO);
+
+    Boolean createTransactionVaadin(TransactionDTO transactionDTO);
+
+
     }

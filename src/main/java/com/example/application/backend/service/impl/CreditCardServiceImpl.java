@@ -62,7 +62,7 @@ public class CreditCardServiceImpl implements CreditCardService {
         }catch (Exception e){
 
             log.error(e.getMessage());
-            User creditCardError = new User();
+            CreditCard creditCardError = new CreditCard();
             creditCardError.setId(-500L);
 
             return (List<CreditCard>) creditCardError;
