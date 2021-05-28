@@ -3,10 +3,12 @@ package com.example.application.views.cuentas;
 import com.example.application.backend.model.*;
 import com.example.application.backend.model.bankaccount.operations.BankAccountUserResponse;
 import com.example.application.backend.model.transaction.operations.TransactionsCreditcardResponse;
+import com.example.application.backend.model.transaction.operations.TransactionsUserResponse;
 import com.example.application.backend.service.BankAccountService;
 import com.example.application.backend.service.CreditCardService;
 import com.example.application.backend.service.TransactionService;
 import com.example.application.backend.service.UserService;
+import com.example.application.views.cuentas.form.AccountForm;
 import com.example.application.views.tarjetas.form.CreditCardForm;
 import com.github.appreciated.card.Card;
 import com.github.appreciated.card.action.ActionButton;
@@ -15,6 +17,7 @@ import com.github.appreciated.card.content.IconItem;
 import com.github.appreciated.card.label.PrimaryLabel;
 import com.github.appreciated.card.label.SecondaryLabel;
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.notification.Notification;
@@ -45,10 +48,11 @@ public class CuentasView extends HorizontalLayout {
     private BankAccountService bankAccountService;
     private TransactionService transactionService;
     private TransactionsCreditcardResponse transactionsCreditcardResponse;
+
     Map<String, String> map1 = new HashMap<>();
 
     private List<BankAccount> bankAccounts;
-    private List<BankAccountUserResponse> miListaBanco = null;
+    BankAccountUserResponse bankAccountUserResponse;
 
 
 
@@ -64,45 +68,41 @@ public class CuentasView extends HorizontalLayout {
         this.bankAccountService = bankaccountService;
         this.transactionService = transactionService;
 
-        loadData();
+        loadDataAllTransactions();
 
 
         //pinta cada bankaccount que tenga el usuario
-        System.out.println(miListaBanco);
-/*
-        miListaBanco.forEach(bankAccount -> add(cardGenerator(bankAccount.getBankAccounts(), bankAccount.getStatus().toString(), bankAccount)));
-*/
+        bankAccounts.forEach(bankAccount -> add(cardGenerator(bankAccount.getId(), bankAccount.getNumAccount().toString(), bankAccount)));
     }
 
-    private void loadData() {
+    /**
+     * Load Data with all Transactions of all bank accounts of a user
+     */
+    private void loadDataAllTransactions() {
+
+        Map<String, String> map1 = new HashMap<>();
+        map1.put("startDate", "2020-01-01 00:00:00.000000");
+        map1.put("endDate", "2022-05-31 23:59:59.999999");
+        map1.put("page", "0");
+        map1.put("limit", "50");
 
         try {
+            this.bankAccountUserResponse = bankAccountService.findAllBankAccountsByIdUser(1L);
+            this.bankAccounts = this.bankAccountUserResponse.getBankAccounts();
 
-            miUser = userService.findOne(1L).get();
+//            for (int i = 0; i < this.transactions.size(); i++){
+//
+//            }
 
-
-/*
-            this.bankAccounts = (List<BankAccount>) bankAccountService.findAllBankAccountsByIdUser(miUser.getId());
-*/
-
-     /*       if(!creditCards.isEmpty()){
-                System.out.println(creditCards);
-                creditCards.forEach(creditCard -> {
-                    System.out.println(creditCard.getId());
-                    miLista.add(transactionService.findAllTransactionsByDateRangeByIdCreditcard(creditCard.getId(), map1));
-                });
-                System.out.println(miLista);
-            }*/
         }
-        catch(Exception ex) {
-            ex.printStackTrace();
+        catch(Exception e) {
+            e.printStackTrace();
 
-            logger.debug(ex.getLocalizedMessage());
         }
     }
 
 
-    public Component cardGenerator(Long idCreditCard, String numBankAccount, String status, BankAccount bankAccount) {
+    public Component cardGenerator(Long idCreditCard, String numBankAccount, BankAccount bankAccount) {
 
 /*
         String maskedNumbers = maskCardNumber(numCreditCard);
@@ -138,27 +138,30 @@ public class CuentasView extends HorizontalLayout {
         Card card = new Card(
                 // if you don't want the title to wrap you can set the whitespace = nowrap
                 logoBanco,
-/*
                 new PrimaryLabel(bankAccount.getBalance().toString()+" €"),
-*/
                 new SecondaryLabel(numBankAccount),
 /*
                 new IconItem(getIcon(cardProvider), ""),
 */
                 new Actions(
-                        new ActionButton("Ver detalles", event -> {
+                        new ActionButton("Transferencias", event -> {
 
-/*
-                            CreditCardForm creditCardForm = new CreditCardForm(creditCard);
-*/
+                            AccountForm accountForm = new AccountForm(bankAccount, transactionService);
 
 
                             // open form dialog view
-/*
-                            creditCardForm.open();
-*/
+                            accountForm.open();
                         })
-                )
+
+                ),
+                new Actions(
+                        new ActionButton("Consultar Movimientos", event -> {
+                            UI.getCurrent().navigate("transactions");
+
+                        })
+
+        )
+
         );
         cardLayout.add(card);
         cardLayout.setAlignItems(Alignment.CENTER);

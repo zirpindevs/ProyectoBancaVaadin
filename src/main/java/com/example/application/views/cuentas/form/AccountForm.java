@@ -1,6 +1,7 @@
 package com.example.application.views.cuentas.form;
 
-import com.example.application.backend.model.CreditCard;
+import com.example.application.backend.model.*;
+import com.example.application.backend.service.TransactionService;
 import com.example.application.views.main.MainView;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
@@ -9,89 +10,117 @@ import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.H3;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Route(value = "account", layout = MainView.class)
 @PageTitle("Account")
 public class AccountForm extends Dialog {
+    Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    private CreditCard creditCard;
+    private BankAccount bankAccount;
+    private Transaction transaction;
+    private TransactionService transactionService;
+    private MovimientoType movimientoTransferencia = MovimientoType.TRANSFERENCIA;
 
-    private TextField  cardNumber = new TextField("Numbero de Tarjeta");
-    private TextField cardholderName = new TextField("Name de la tarjeta");
-    private TextField creditCardType = new TextField("Tipo de tarjeta");
-    private TextField card_provider = new TextField("Proovedor de Tarjeta");
+    private TextField  numberBankAccount = new TextField("Numbero Cuenta Origen");
+    private TextField importe = new TextField("Importe");
+    private TextField concepto = new TextField("Concepto");
+    private TextField tipoMovimiento = new TextField("Tipo Movimiento");
 
-    private Checkbox enabled = new Checkbox();
+    private Button enviar = new Button("Enviar");
 
-    private TextField dateField = new TextField("Fecha de Expiracion");
+    private Button salir = new Button("Salir");
 
-    private PasswordField pin = new PasswordField("PIN");
-    private PasswordField cvv = new PasswordField("CVV");
-
-    private Button Salir = new Button("Salir");
-
-    public AccountForm(CreditCard creditCard) {
+    public AccountForm(BankAccount bankAccount, TransactionService transactionService) {
 
         super();
-        this.creditCard = creditCard;
+        this.bankAccount = bankAccount;
+        this.transaction = transaction;
+        this.transactionService = transactionService;
 
 
         add(createTitle());
         add(createFormLayout());
-        add(createButtonLayout(creditCard));
+        add(createButtonLayout(bankAccount));
 
-        Salir.addClickListener(e -> {
+
+        enviar.addClickListener(e -> {
+
+            if(createTransaction()) {
+                Notification.show("Transferencia realizada");
+                close();
+            }
+
+            Notification.show("Error en la transferencia");
+            close();
+
+
+        });
+
+        salir.addClickListener(e -> {
             close();
 
         });
     }
 
+
     private Component createTitle() {
-        return new H3("Detalles de la Tarjeta de Credito");
+        return new H3("Realizar Transferencia");
     }
 
     private Component createFormLayout() {
         FormLayout formLayout = new FormLayout();
-        formLayout.add(cardNumber, cardholderName, dateField, creditCardType, card_provider, pin, cvv);
+        formLayout.add(numberBankAccount, tipoMovimiento, importe, concepto);
         return formLayout;
     }
 
-    private Component createButtonLayout(CreditCard creditCard) {
+    private Component createButtonLayout(BankAccount bankAccount) {
+
         HorizontalLayout buttonLayout = new HorizontalLayout();
-        buttonLayout.addClassName("button-layout");
-
-        cardNumber.setValue(creditCard.getNumCreditCard().toString());
-        cardNumber.setReadOnly(true);
-
-        cardholderName.setValue(creditCard.getPlaceholder().toString());
-        cardholderName.setReadOnly(true);
-
-        creditCardType.setValue(creditCard.getType().toString());
-        creditCardType.setReadOnly(true);
-
-        card_provider.setValue(creditCard.getCardProvider().toString());
-        card_provider.setReadOnly(true);
-
-        pin.setValue(creditCard.getPin().toString());
-        pin.setReadOnly(true);
-
-        cvv.setValue(creditCard.getCvv().toString());
-        cvv.setReadOnly(true);
+        buttonLayout.addClassName("transferencia-layout");
 
 
-        dateField.setValue(creditCard.getExpirationDate().toString());
-        dateField.setReadOnly(true);
+        numberBankAccount.setValue(bankAccount.getNumAccount().toString());
+        numberBankAccount.setReadOnly(true);
 
-        Salir.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        tipoMovimiento.setValue(movimientoTransferencia.toString());
+        tipoMovimiento.setReadOnly(true);
 
-        buttonLayout.add(Salir);
+        importe.setPlaceholder("Importe");
+        importe.setRequired(true);
+
+        concepto.setPlaceholder("concepto");
+
+        enviar.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+
+        buttonLayout.add(enviar);
+        buttonLayout.add(salir);
         return buttonLayout;
     }
 
+    private Boolean createTransaction() {
+        TransactionDTO nuevaTransaction = new TransactionDTO();
+        try {
+            nuevaTransaction.setConcepto(concepto.getValue());
+            nuevaTransaction.setImporte(Double.valueOf(importe.getValue()));
+            nuevaTransaction.setTipoMovimiento(movimientoTransferencia);
+            nuevaTransaction.setIdBankAccount(bankAccount.getId());
+
+            transactionService.createTransaction(nuevaTransaction);
+
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            nuevaTransaction.setId(-500L);
+            return false;
+        }
+        return true;
+    }
 
 }
