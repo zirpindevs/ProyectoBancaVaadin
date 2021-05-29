@@ -436,4 +436,20 @@ public class TransactionDAOImpl implements TransactionDAO {
 
     }
 
+    @Override
+    public Object[] findAllBalanceAfterTransaction(Long idUser) {
+
+            Query queryNative = manager.createNativeQuery(
+                    "SELECT t.balance_after_transaction from transactions t " +
+                            "INNER JOIN users_bank_accounts uba ON uba.bank_account_id = t.id_bank_account " +
+                            "WHERE uba.user_id = " + idUser
+            );
+
+            List resultDB = queryNative.getResultList();
+
+        return resultDB.toArray();
+
+
+    }
+
 }

@@ -19,4 +19,7 @@ public interface TransactionDAO {
 
     Boolean insertNewTransactionAndUpdateBalance(TransactionDTO transactionDTO, BankAccount bankAccount);
 
+    Object findAllBalanceAfterTransaction(Long idUser);
+
+
     }

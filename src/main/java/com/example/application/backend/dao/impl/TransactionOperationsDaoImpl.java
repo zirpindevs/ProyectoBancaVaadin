@@ -183,6 +183,23 @@ public class TransactionOperationsDaoImpl implements TransactionOperationsDao {
         }
     }
 
+
+    @Override
+    public Object getAllOperationsByCategoryBankAccount(Long idBankAccount) {
+
+
+
+                Query queryNative = manager.createNativeQuery(
+                        "SELECT COUNT(id) AS totalTransactions from transactions " +
+                                "WHERE `id_bank_account` = " + idBankAccount
+                                + " GROUP BY id_category"
+                );
+                List result = queryNative.getResultList();
+
+                return result;
+
+    }
+
 }
 
 
