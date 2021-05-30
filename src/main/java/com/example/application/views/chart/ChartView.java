@@ -1,12 +1,15 @@
 package com.example.application.views.chart;
 
+import com.example.application.backend.dao.CategoryDao;
 import com.example.application.backend.dao.TransactionDAO;
 import com.example.application.backend.dao.TransactionOperationsDao;
 import com.example.application.backend.model.Transaction;
+import com.example.application.backend.repository.CategoryRepository;
 import com.example.application.backend.service.TransactionService;
 import com.example.application.views.main.MainView;
 import com.github.appreciated.apexcharts.ApexCharts;
 import com.github.appreciated.apexcharts.ApexChartsBuilder;
+import com.github.appreciated.apexcharts.config.DataLabels;
 import com.github.appreciated.apexcharts.config.builder.*;
 import com.github.appreciated.apexcharts.config.chart.Type;
 import com.github.appreciated.apexcharts.config.chart.builder.ZoomBuilder;
@@ -16,9 +19,11 @@ import com.github.appreciated.apexcharts.config.plotoptions.builder.BarBuilder;
 import com.github.appreciated.apexcharts.config.responsive.builder.OptionsBuilder;
 import com.github.appreciated.apexcharts.config.stroke.Curve;
 import com.github.appreciated.apexcharts.config.subtitle.Align;
+import com.github.appreciated.apexcharts.config.xaxis.Labels;
 import com.github.appreciated.apexcharts.config.xaxis.XAxisType;
 import com.github.appreciated.apexcharts.helper.Series;
 import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
@@ -38,11 +43,13 @@ public class ChartView extends HorizontalLayout {
 	TransactionService transactionService;
 	TransactionDAO transactionDAO;
 	TransactionOperationsDao transactionOperationsDao;
+	CategoryDao categoryDao;
 
-	public ChartView(TransactionService transactionService, TransactionDAO transactionDAO, TransactionOperationsDao transactionOperationsDao){
+	public ChartView(TransactionService transactionService, TransactionDAO transactionDAO, TransactionOperationsDao transactionOperationsDao, CategoryDao categoryDao){
 		this.transactionService = transactionService;
 		this.transactionDAO = transactionDAO;
 		this.transactionOperationsDao = transactionOperationsDao;
+		this.categoryDao = categoryDao;
 		this.setSizeFull();
 		this.setPadding(true);
 
@@ -133,31 +140,17 @@ public class ChartView extends HorizontalLayout {
 				{
 
 					List transactionOperations = transactionOperationsDao.getAllOperationsByCategoryBankAccount(1L);
+					List<String> categoriesName = categoryDao.findAllByName();
 
 					Series donutSerie = new Series();
 
-
 					List<String> listaString= new ArrayList<>();
+					List<Double> listaDouble = new ArrayList<>();
 
-					listaString.add(transactionOperations.get(0).toString());
-					listaString.add(transactionOperations.get(1).toString());
-					listaString.add(transactionOperations.get(2).toString());
-					listaString.add(transactionOperations.get(3).toString());
-					listaString.add(transactionOperations.get(4).toString());
-
-					List<Double> listaDouble= new ArrayList<>();
-
-					listaDouble.add(Double.valueOf(listaString.get(0)));
-					listaDouble.add(Double.valueOf(listaString.get(1)));
-					listaDouble.add(Double.valueOf(listaString.get(2)));
-					listaDouble.add(Double.valueOf(listaString.get(3)));
-					listaDouble.add(Double.valueOf(listaString.get(4)));
-
-
-//					donutSerie.setData((Object[]) transactionOperations);
-
-				//	donutSerie.setData((Object[]) transactionOperations2);
-
+					for(int x = 0; x < transactionOperations.size();x++) {
+						listaString.add(transactionOperations.get(x).toString());
+						listaDouble.add(Double.valueOf(listaString.get(x)));
+					}
 
 					ApexCharts donutChart = ApexChartsBuilder.get()
 							.withChart(ChartBuilder.get().withType(Type.donut).build())
@@ -166,7 +159,7 @@ public class ChartView extends HorizontalLayout {
 									.build())
 
 							.withSeries(listaDouble.get(0), listaDouble.get(1), listaDouble.get(2), listaDouble.get(3), listaDouble.get(4))
-							.withLabels("Gasolina","Ocio","Alimentacion","Otros","Restauracion")
+							.withLabels(categoriesName.get(0), categoriesName.get(1), categoriesName.get(2), categoriesName.get(3), categoriesName.get(4))
 
 							.withResponsive(ResponsiveBuilder.get()
 									.withBreakpoint(480.0)
