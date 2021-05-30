@@ -191,7 +191,7 @@ public class TransactionOperationsDaoImpl implements TransactionOperationsDao {
                 Query queryNative = manager.createNativeQuery(
                         "SELECT COUNT(id) AS totalTransactions from transactions " +
                                 "WHERE `id_bank_account` = " + idBankAccount
-                                + " GROUP BY id_category"
+                                + " GROUP BY id_category ORDER BY id_category"
                 );
                 List result = queryNative.getResultList();
 
