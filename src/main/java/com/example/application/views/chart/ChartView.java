@@ -34,8 +34,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.IntStream;
 
-@Route(value = "about", layout = MainView.class)
-@PageTitle("About")
+@Route(value = "graficas", layout = MainView.class)
+@PageTitle("Graficas")
 public class ChartView extends HorizontalLayout {
 
 	Series testSeries = new Series();
