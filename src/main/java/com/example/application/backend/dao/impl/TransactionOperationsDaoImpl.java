@@ -185,8 +185,7 @@ public class TransactionOperationsDaoImpl implements TransactionOperationsDao {
 
 
     @Override
-    public Object getAllOperationsByCategoryBankAccount(Long idBankAccount) {
-
+    public List getAllOperationsByCategoryBankAccount(Long idBankAccount) {
 
 
                 Query queryNative = manager.createNativeQuery(
@@ -196,7 +195,8 @@ public class TransactionOperationsDaoImpl implements TransactionOperationsDao {
                 );
                 List result = queryNative.getResultList();
 
-                return result;
+                                return result;
+
 
     }
 

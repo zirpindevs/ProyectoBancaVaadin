@@ -25,6 +25,8 @@ import com.vaadin.flow.router.Route;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.IntStream;
 
 @Route(value = "about", layout = MainView.class)
@@ -51,7 +53,7 @@ public class ChartView extends HorizontalLayout {
 /*
 		add(new AreaChartExample(), new DonutChartExample());
 */
-		add(new AreaBarChartExample());
+		add(new AreaBarChartExample(), new DonutChartExample());
 
 
 	}
@@ -130,13 +132,31 @@ public class ChartView extends HorizontalLayout {
 				public DonutChartExample()
 				{
 
-					Object transactionOperations = transactionOperationsDao.getAllOperationsByCategoryBankAccount(1L);
-
-					transactionOperations.toString();
+					List transactionOperations = transactionOperationsDao.getAllOperationsByCategoryBankAccount(1L);
 
 					Series donutSerie = new Series();
-					donutSerie.setData((Object[]) transactionOperations);
 
+
+					List<String> listaString= new ArrayList<>();
+
+					listaString.add(transactionOperations.get(0).toString());
+					listaString.add(transactionOperations.get(1).toString());
+					listaString.add(transactionOperations.get(2).toString());
+					listaString.add(transactionOperations.get(3).toString());
+					listaString.add(transactionOperations.get(4).toString());
+
+					List<Double> listaDouble= new ArrayList<>();
+
+					listaDouble.add(Double.valueOf(listaString.get(0)));
+					listaDouble.add(Double.valueOf(listaString.get(1)));
+					listaDouble.add(Double.valueOf(listaString.get(2)));
+					listaDouble.add(Double.valueOf(listaString.get(3)));
+					listaDouble.add(Double.valueOf(listaString.get(4)));
+
+
+//					donutSerie.setData((Object[]) transactionOperations);
+
+				//	donutSerie.setData((Object[]) transactionOperations2);
 
 
 					ApexCharts donutChart = ApexChartsBuilder.get()
@@ -144,7 +164,10 @@ public class ChartView extends HorizontalLayout {
 							.withLegend(LegendBuilder.get()
 									.withPosition(Position.right)
 									.build())
-							.withSeries(donutSerie)
+
+							.withSeries(listaDouble.get(0), listaDouble.get(1), listaDouble.get(2), listaDouble.get(3), listaDouble.get(4))
+							.withLabels("Gasolina","Ocio","Alimentacion","Otros","Restauracion")
+
 							.withResponsive(ResponsiveBuilder.get()
 									.withBreakpoint(480.0)
 									.withOptions(OptionsBuilder.get()
