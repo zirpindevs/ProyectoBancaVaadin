@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -88,4 +89,16 @@ public class CategoryDaoImpl implements CategoryDao {
 
         return predicates;
     }
+
+    @Override
+    public List<String> findAllByName(){
+
+        Query queryNative = manager.createNativeQuery(
+                "SELECT name FROM categories order by id"
+        );
+        List result = queryNative.getResultList();
+
+        return result;
+    }
+
 }
