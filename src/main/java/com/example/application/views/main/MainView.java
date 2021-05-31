@@ -3,6 +3,7 @@ package com.example.application.views.main;
 import java.util.Optional;
 
 import com.example.application.views.chart.ChartView;
+import com.example.application.views.login.LoginView;
 import com.example.application.views.movimientos.MovimientosView;
 import com.example.application.views.tarjetas.TarjetasView;
 import com.vaadin.flow.component.Component;
@@ -21,6 +22,7 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.component.tabs.TabsVariant;
+import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouterLink;
 import com.vaadin.flow.server.PWA;
 import com.vaadin.flow.theme.Theme;
@@ -31,6 +33,7 @@ import com.example.application.views.inicio.InicioView;
 /**
  * The main view is a top-level placeholder for other views.
  */
+@Route(value = "main")
 @PWA(name = "IngeniaBank", shortName = "IngeniaBank", enableInstallPrompt = false)
 @Theme(themeFolder = "proyectobanca")
 public class MainView extends AppLayout {

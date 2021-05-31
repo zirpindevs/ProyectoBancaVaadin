@@ -25,7 +25,7 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 
 @Route(value = "inicio", layout = MainView.class)
-@RouteAlias(value = "", layout = MainView.class)
+@RouteAlias(value = "inicio", layout = MainView.class)
 @PageTitle("Inicio")
 public class InicioView extends Div {
 

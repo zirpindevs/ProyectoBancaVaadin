@@ -80,6 +80,11 @@ public class User {
     public User() {
     }
 
+    public User(String nif, String password) {
+        this.nif = nif;
+        this.password = password;
+    }
+
     public User(String nif, String email, String password) {
         this.nif = nif;
         this.email = email;
