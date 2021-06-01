@@ -14,6 +14,8 @@ import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -21,6 +23,11 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity // permite a Spring aplicar esta configuracion a la configuraicon de seguridad global
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
+
+    private static final String LOGIN_PROCESSING_URL = "/login";
+    private static final String LOGIN_FAILURE_URL = "/login?error";
+    private static final String LOGIN_URL = "/login";
+    private static final String LOGOUT_SUCCESS_URL = "/login";
 
     @Autowired
     private UserDetailsServiceImpl userDetailsService;
@@ -65,9 +72,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         // Cross-Site Request Forgery CSRF
         // CORS (Cross-origin resource sharing)
-        http.cors().and().csrf().disable()
-                .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
+       // http.cors().and().csrf().disable()
+        http.csrf().disable()
+              //  .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
+              //  .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
+              //  .anonymous().disable()
 
                 // Register our CustomRequestCache, that saves unauthorized access attempts, so
                 // the user is redirected after login.
@@ -75,28 +84,23 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and().authorizeRequests().antMatchers("/api/auth/**").permitAll()
                 // Allow all flow internal requests.
                 .requestMatchers(SecurityUtils::isFrameworkInternalRequest).permitAll()
-                .antMatchers("/login").permitAll()
+              //  .antMatchers("/login").permitAll()
                 .antMatchers("/VAADIN/**").permitAll()
 
                 .antMatchers("/api/**").permitAll()
-                .anyRequest().authenticated();
+                .anyRequest().authenticated()
+                // Configure the login page.
+                .and().formLogin()
+                .loginPage("/login").permitAll()
+                .loginProcessingUrl(LOGIN_PROCESSING_URL)
+                .failureUrl(LOGIN_FAILURE_URL)
 
-               /*  Descomentar para tener autenticación
-                .antMatchers(HttpMethod.GET, "/api/users/**").permitAll()
-                .antMatchers(HttpMethod.GET, "/api/creditcards/**").permitAll()
-                .antMatchers(HttpMethod.GET, "/api/bankaccounts/**").permitAll()
-                .antMatchers(HttpMethod.GET, "/api/categories/**").permitAll()
-                .antMatchers(HttpMethod.GET, "/api/transactions/**").permitAll()
-
-                .anyRequest().authenticated();
-
-                */
-                // Comentar si pones autenticación
-            /*    .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and().cors();*/
+                // Configure logout
+                .and().logout().logoutSuccessUrl(LOGOUT_SUCCESS_URL);
 
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
     }
+
 
     /**
      * Allows access to static resources, bypassing Spring security.
