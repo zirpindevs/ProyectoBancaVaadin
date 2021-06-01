@@ -75,7 +75,6 @@ import java.util.stream.IntStream;
 public class InicioView extends HorizontalLayout {
 
     Logger logger = LoggerFactory.getLogger(this.getClass());
-    private static final int NOTIFICATION_DEFAULT_DURATION = 5000;
 
     private final TransactionService transactionService;
     private final BankAccountService bankAccountService;
@@ -418,6 +417,7 @@ public class InicioView extends HorizontalLayout {
     private Component createViewLayout() {
 
         Div gridViewLayout = new Div();
+
 
         gridTransactions.setWidth("100%");
         gridTransactions.setHeightFull();
