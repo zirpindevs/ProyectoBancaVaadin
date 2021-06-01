@@ -169,7 +169,8 @@ public class MovimientosView extends VerticalLayout {
         gridTransactions.setWidth("100%");
         gridTransactions.setHeightFull();
 
-        add(toolbarLayout, gridTransactions);
+        //add(toolbarLayout, gridTransactions);
+        add(gridTransactions);
     }
 
     private Component createToolBarLayout() {

@@ -1,9 +1,11 @@
 package com.example.application.views.cuentas;
 
+import com.example.application.backend.config.SecurityConfig;
 import com.example.application.backend.model.*;
 import com.example.application.backend.model.bankaccount.operations.BankAccountUserResponse;
 import com.example.application.backend.model.transaction.operations.TransactionsCreditcardResponse;
 import com.example.application.backend.model.transaction.operations.TransactionsUserResponse;
+import com.example.application.backend.security.service.UserDetailsServiceImpl;
 import com.example.application.backend.service.BankAccountService;
 import com.example.application.backend.service.CreditCardService;
 import com.example.application.backend.service.TransactionService;
@@ -31,7 +33,9 @@ import com.example.application.views.main.MainView;
 import com.vaadin.flow.router.RouteAlias;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -44,8 +48,10 @@ import java.util.Map;
 @PageTitle("Cuentas")
 public class CuentasView extends HorizontalLayout {
 
-    private static Long TEST_USER = 1L;
-    private String nif;
+    @Autowired
+    private UserDetailsServiceImpl userDetailsService;
+
+    private static User userLogged;
 
     Logger logger = LoggerFactory.getLogger(this.getClass());
     private static final int NOTIFICATION_DEFAULT_DURATION = 5000;
@@ -66,30 +72,53 @@ public class CuentasView extends HorizontalLayout {
     private Binder<CreditCard> creditCardBinder = new BeanValidationBinder<CreditCard>(CreditCard.class);
 
 
-    public CuentasView(UserService userService, BankAccountService bankaccountService, TransactionService transactionService) {
+    public CuentasView(UserService userService, BankAccountService bankaccountService, TransactionService transactionService, UserDetailsServiceImpl userDetailsService) {
   /*      this.setSizeFull();
         this.setPadding(true);*/
+/*
+        userLogged = userDetailsService.getUserLogged();
+        System.out.println(userLogged.toString());*/
 
         this.userService = userService;
         this.bankAccountService = bankaccountService;
         this.transactionService = transactionService;
+        this.userDetailsService = userDetailsService;
+
+        this.userLogged = userDetailsService.getUserLogged();
+        System.out.println(userLogged.toString());
+
 
         loadDataAllTransactions();
 
 
         //pinta cada bankaccount que tenga el usuario
         bankAccounts.forEach(bankAccount -> add(cardGenerator(bankAccount.getId(), bankAccount.getNumAccount().toString(), bankAccount)));
+
     }
 
-    @PostConstruct
+/*    @PostConstruct
     public void init() {
         Authentication auth = SecurityContextHolder
                 .getContext()
                 .getAuthentication();
-        UserDetails userDetail = (UserDetails) auth.getPrincipal();
-        this.nif = userDetail.getUsername();
+     //   this.nif = user.getUsername();
+       // UserDetails userDetail = (UserDetails) auth.getPrincipal();
+      //  this.nif = userDetail.getUsername();
+       // System.out.println(this.nif);
+      //  Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+     //   String currentPrincipalName = authentication.getName();
+    //    System.out.println(currentPrincipalName);
 
-    }
+        this.userLogged = userDetailsService.getUserLogged();
+        System.out.println(userLogged.toString());
+
+
+        loadDataAllTransactions();
+
+
+        //pinta cada bankaccount que tenga el usuario
+        bankAccounts.forEach(bankAccount -> add(cardGenerator(bankAccount.getId(), bankAccount.getNumAccount().toString(), bankAccount)));
+    }*/
 
     /**
      * Load Data with all Transactions of all bank accounts of a user
@@ -103,7 +132,8 @@ public class CuentasView extends HorizontalLayout {
         map1.put("limit", "50");
 
         try {
-            this.bankAccountUserResponse = bankAccountService.findAllBankAccountsByIdUser(TEST_USER);
+          //  this.bankAccountUserResponse = bankAccountService.findAllBankAccountsByIdUser(TEST_USER);
+            this.bankAccountUserResponse = bankAccountService.findAllBankAccountsByIdUser(this.userLogged.getId());
             this.bankAccounts = this.bankAccountUserResponse.getBankAccounts();
 
 //            for (int i = 0; i < this.transactions.size(); i++){
@@ -162,7 +192,7 @@ public class CuentasView extends HorizontalLayout {
                 new Actions(
                         new ActionButton("Transferencias", event -> {
 
-                            AccountForm accountForm = new AccountForm(bankAccount, transactionService, TEST_USER);
+                            AccountForm accountForm = new AccountForm(bankAccount, transactionService, userLogged.getId());
 
 
                             // open form dialog view

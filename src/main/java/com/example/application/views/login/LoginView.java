@@ -2,8 +2,8 @@ package com.example.application.views.login;
 
 import com.example.application.backend.payload.request.LoginRequest;
 import com.example.application.backend.payload.response.JwtResponse;
-import com.example.application.backend.repository.UserRepository;
-import com.example.application.backend.security.jwt.JwtTokenUtil;
+
+import com.example.application.backend.security.service.AuthService;
 import com.example.application.backend.security.service.UserDetailsServiceImpl;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.formlayout.FormLayout;
@@ -24,24 +24,13 @@ import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.spring.annotation.UIScope;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.RequestBody;
-import springfox.documentation.swagger.web.SecurityConfiguration;
+
 
 
 @Route(value = "login")
-//@Route(value = LoginView.NAME)
 @PageTitle("Login")
 @UIScope
 public class LoginView extends HorizontalLayout {
-
-   // private UserAuthenticationDAO userAuthenticationDAO;
 
     private UserDetailsServiceImpl userDetailsService;
 
@@ -51,30 +40,11 @@ public class LoginView extends HorizontalLayout {
     private TextField userNameTextField = new TextField("NIF");
     private PasswordField passwordTextField = new PasswordField("Password");
     private Button signInButton = new Button("Sign in", e ->  signIn(user));
-    private Label newUserLabel = new Label("<span style='cursor: pointer; color:blue'>new user?</span>");
+   // private Label newUserLabel = new Label("<span style='cursor: pointer; color:blue'>new user?</span>");
 
-    //**************************************************************************************************
-    @Autowired
-    AuthenticationManager authenticationManager;
 
     @Autowired
-    UserRepository userRepository;
-
-    @Autowired
-    PasswordEncoder encoder;
-
-    @Autowired
-    JwtTokenUtil jwtTokenUtil;
-
-
-    //**************************************************************************************************
-
-
-/*    @Autowired
-    public void setUserAuthenticationDAO(UserAuthenticationDAO userAuthenticationDAO){
-
-        this.userAuthenticationDAO = userAuthenticationDAO;
-    }*/
+    AuthService authService;
 
     @Autowired
     public void setUserDetailsService(UserDetailsServiceImpl userDetailsService){
@@ -85,9 +55,10 @@ public class LoginView extends HorizontalLayout {
     public LoginView(){
 
         // Initialize and arrange layout components
-        HorizontalLayout signUpLayout = new HorizontalLayout(newUserLabel);
-        FormLayout logInFormLayout = new FormLayout(userNameTextField, passwordTextField,
-                                                    signUpLayout, signInButton);
+       // HorizontalLayout signUpLayout = new HorizontalLayout(newUserLabel);
+      //  FormLayout logInFormLayout = new FormLayout(userNameTextField, passwordTextField,
+      //                                              signUpLayout, signInButton);
+        FormLayout logInFormLayout = new FormLayout(userNameTextField, passwordTextField, signInButton);
         VerticalLayout logInPageLayout = new VerticalLayout(logInFormLayout);
         logInFormLayout.setSizeUndefined();
         logInPageLayout.setSizeFull();
@@ -116,9 +87,10 @@ public class LoginView extends HorizontalLayout {
         LoginRequest userLogin = new LoginRequest();
         userLogin.setNif(userRequest.getNif());
         userLogin.setPassword(userRequest.getPassword());
+
         try{
-            JwtResponse token = this.authenticateUser(userLogin);
-            UI.getCurrent().navigate("cuentas");
+            JwtResponse token = authService.authenticateUser(userLogin);
+            UI.getCurrent().navigate("inicio");
        //     SecurityConfiguration.getUserDetails().getUsername()
 
         }catch (Exception e){
@@ -128,20 +100,6 @@ public class LoginView extends HorizontalLayout {
 
     }
 
-    public JwtResponse authenticateUser( LoginRequest loginRequest){
-
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginRequest.getNif(), loginRequest.getPassword()));
-
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        String jwt = jwtTokenUtil.generateJwtToken(authentication);
-
-
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        String nif = userDetails.getUsername();
-
-        return new JwtResponse(jwt);
-    }
 
    // @Override
     public void beforeLeave (BeforeLeaveEvent event){
