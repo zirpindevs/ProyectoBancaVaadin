@@ -136,6 +136,7 @@ public class LoginView extends HorizontalLayout {
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String jwt = jwtTokenUtil.generateJwtToken(authentication);
 
+
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         String nif = userDetails.getUsername();
 
