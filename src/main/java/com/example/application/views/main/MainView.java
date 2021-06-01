@@ -2,6 +2,8 @@ package com.example.application.views.main;
 
 import java.util.Optional;
 
+import com.example.application.backend.model.User;
+import com.example.application.backend.repository.UserRepository;
 import com.example.application.views.chart.ChartView;
 import com.example.application.views.movimientos.MovimientosView;
 import com.example.application.views.tarjetas.TarjetasView;
@@ -28,6 +30,11 @@ import com.vaadin.flow.theme.Theme;
 import com.vaadin.flow.router.PageTitle;
 import com.example.application.views.cuentas.CuentasView;
 import com.example.application.views.inicio.InicioView;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import javax.annotation.PostConstruct;
 
 /**
  * The main view is a top-level placeholder for other views.
@@ -37,14 +44,34 @@ import com.example.application.views.inicio.InicioView;
 @Theme(themeFolder = "proyectobanca")
 public class MainView extends AppLayout {
 
+    private User loggedUser = new User();
+    private String nif;
+
     private final Tabs menu;
     private H1 viewTitle;
 
-    public MainView() {
+    private UserRepository userRepository;
+
+
+    public MainView(UserRepository userRepository) {
+        this.userRepository = userRepository;
+
         setPrimarySection(Section.DRAWER);
         addToNavbar(true, createHeaderContent());
         menu = createMenu();
         addToDrawer(createDrawerContent(menu));
+    }
+
+    @PostConstruct
+    public void init() {
+        Authentication auth = SecurityContextHolder
+                .getContext()
+                .getAuthentication();
+        UserDetails userDetail = (UserDetails) auth.getPrincipal();
+        this.nif = userDetail.getUsername();
+        loggedUser = userRepository.findOneByNif(this.nif).get();
+
+
     }
 
     private Component createHeaderContent() {
@@ -119,7 +146,7 @@ public class MainView extends AppLayout {
 /*
         avatar.setName(SecurityConfiguration.getUserDetails().getUsername());
 */
-        avatar.setName("usuario");
+        avatar.setName(loggedUser.getName());
 
 
         ContextMenu contextMenu = new ContextMenu();
