@@ -9,7 +9,7 @@ public interface CategoryDao {
 
     List<Category> findAllByFilters(Map<String, String> map1);
 
-    List<String> findAllByName();
+    List<String> findChartCategoriesAllByName();
 
 
     }

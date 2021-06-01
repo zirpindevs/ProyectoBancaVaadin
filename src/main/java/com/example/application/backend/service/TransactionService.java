@@ -33,5 +33,8 @@ public interface TransactionService {
 
     Boolean createTransactionVaadin(TransactionDTO transactionDTO);
 
+    Object[] findAllBalanceAfterTransaction(Long idUser);
+
+
 
     }

@@ -63,9 +63,8 @@ public class TarjetasView extends HorizontalLayout {
 
         loadData();
 
-
         //pinta cada creditcard que tenga el usuario
-        creditCards.forEach(creditCard -> add(cardGenerator(creditCard.getId(), creditCard.getNumCreditCard(), creditCard.getCardProvider(), creditCard)));
+        creditCards.forEach(creditCard -> add(cardGenerator(creditCard)));
 
     }
 
@@ -77,14 +76,6 @@ public class TarjetasView extends HorizontalLayout {
 
             this.creditCards = creditCardService.findbyUser(miUser.getId());
 
-     /*       if(!creditCards.isEmpty()){
-                System.out.println(creditCards);
-                creditCards.forEach(creditCard -> {
-                    System.out.println(creditCard.getId());
-                    miLista.add(transactionService.findAllTransactionsByDateRangeByIdCreditcard(creditCard.getId(), map1));
-                });
-                System.out.println(miLista);
-            }*/
         }
         catch(Exception ex) {
             ex.printStackTrace();
@@ -94,9 +85,9 @@ public class TarjetasView extends HorizontalLayout {
     }
 
 
-    public Component cardGenerator(Long idCreditCard, String numCreditCard, String cardProvider, CreditCard creditCard) {
+    public Component cardGenerator(CreditCard creditCard) {
 
-        String maskedNumbers = maskCardNumber(numCreditCard);
+        String maskedNumbers = maskCardNumber(creditCard.getNumCreditCard());
         HorizontalLayout cardLayout = new HorizontalLayout();
 
         Image logoBanco = new Image();
@@ -110,7 +101,7 @@ public class TarjetasView extends HorizontalLayout {
         map1.put("page", "0");
         map1.put("limit", "50");
 
-        TransactionsCreditcardResponse balanceTarjeta = transactionService.findAllTransactionsByDateRangeByIdCreditcard(idCreditCard, map1);
+        TransactionsCreditcardResponse balanceTarjeta = transactionService.findAllTransactionsByDateRangeByIdCreditcard(creditCard.getId(), map1);
 
         List<TransactionDTO> transactionsTarjetas = balanceTarjeta.getTransactions();
 
@@ -124,13 +115,12 @@ public class TarjetasView extends HorizontalLayout {
 
 
 
-
         Card card = new Card(
                     // if you don't want the title to wrap you can set the whitespace = nowrap
                     logoBanco,
                     new PrimaryLabel(saldoTarjeta.toString()+" €"),
                     new SecondaryLabel(maskedNumbers),
-                    new IconItem(getIcon(cardProvider), ""),
+                    new IconItem(getIcon(creditCard.getCardProvider()), ""),
                     new Actions(
                             new ActionButton("Ver detalles", event -> {
 

@@ -3,7 +3,6 @@ package com.example.application.views.main;
 import java.util.Optional;
 
 import com.example.application.views.chart.ChartView;
-import com.example.application.views.login.LoginView;
 import com.example.application.views.movimientos.MovimientosView;
 import com.example.application.views.tarjetas.TarjetasView;
 import com.vaadin.flow.component.Component;
@@ -92,7 +91,7 @@ public class MainView extends AppLayout {
                 createTab("Cuentas", CuentasView.class),
                 createTab("Tarjetas", TarjetasView.class),
                 createTab("Movimientos", MovimientosView.class),
-                createTab("Graficas", ChartView.class)};
+                createTab("Balance", ChartView.class)};
     }
 
     private static Tab createTab(String text, Class<? extends Component> navigationTarget) {
@@ -106,7 +105,7 @@ public class MainView extends AppLayout {
             tab.add(new Image("/images/menu/tarjetas.png",""));
         if(text.equals("Movimientos"))
             tab.add(new Image("/images/menu/transfer.png",""));
-        if(text.equals("Graficas"))
+        if(text.equals("Balance"))
             tab.add(new Image("/images/menu/balance.png",""));
 
         tab.add(new RouterLink(text, navigationTarget));

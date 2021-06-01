@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
@@ -353,5 +354,20 @@ public class TransactionOperationsServiceImpl implements TransactionOperationsSe
 
             return dailyOperationsResponse;
         }
+
+    public List getAllOperationsByCategoryBankAccount(Long idBankAccount) {
+
+        try {
+            return this.transactionOperationsDao.getAllOperationsByCategoryBankAccount(idBankAccount);
+
+        } catch (Exception e) {
+
+            log.error(e.getMessage());
+            List<String> listsError = new ArrayList<>();
+            listsError.add("-500");
+
+            return listsError;
+        }
+    }
 
 }

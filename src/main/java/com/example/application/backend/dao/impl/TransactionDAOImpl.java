@@ -439,6 +439,8 @@ public class TransactionDAOImpl implements TransactionDAO {
     @Override
     public Object[] findAllBalanceAfterTransaction(Long idUser) {
 
+        try {
+
             Query queryNative = manager.createNativeQuery(
                     "SELECT t.balance_after_transaction from transactions t " +
                             "INNER JOIN users_bank_accounts uba ON uba.bank_account_id = t.id_bank_account " +
@@ -449,6 +451,10 @@ public class TransactionDAOImpl implements TransactionDAO {
 
         return resultDB.toArray();
 
+        }catch (Exception e){
+            log.error(e.getMessage());
+            return null;
+        }
 
     }
 

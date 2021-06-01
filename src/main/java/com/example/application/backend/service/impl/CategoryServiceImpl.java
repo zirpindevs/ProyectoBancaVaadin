@@ -33,6 +33,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     private final CategoryDao categoryDao;
 
+
     public CategoryServiceImpl(CategoryRepository repository, CategoryDao categoryDao) {
         this.repository = repository;
         this.categoryDao = categoryDao;
@@ -42,6 +43,7 @@ public class CategoryServiceImpl implements CategoryService {
     /**
      * Get all categories with optionals filters options (String name, String pag, String limit)
      * Service Method
+     *
      * @param map1 map with all filters options (String name, String pag, String limit)
      * @return List of categories from database
      */
@@ -52,7 +54,7 @@ public class CategoryServiceImpl implements CategoryService {
 
             return this.categoryDao.findAllByFilters(map1);
 
-        }catch (Exception e){
+        } catch (Exception e) {
 
             log.error(e.getMessage());
             e.printStackTrace();
@@ -67,21 +69,22 @@ public class CategoryServiceImpl implements CategoryService {
 
     /**
      * Get category by ID - Service
+     *
      * @param id Primary key of Category: Long
      * @return Optional<Category> from database
      */
     @Override
-    public Optional<Category> findOne(Long id){
+    public Optional<Category> findOne(Long id) {
         try {
 
-            if(id == null)
+            if (id == null)
                 return Optional.empty();
 
             Optional<Category> result = this.repository.findById(id);
 
             return result;
 
-        }catch (Exception e){
+        } catch (Exception e) {
 
             log.error(e.getMessage());
             Category categoryError = new Category();
@@ -93,6 +96,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     /**
      * Create a new category in database - Service
+     *
      * @param category Category to create
      * @return category created in database
      */
@@ -108,7 +112,7 @@ public class CategoryServiceImpl implements CategoryService {
 
             return repository.save(category);
 
-        }catch (Exception e){
+        } catch (Exception e) {
 
             log.error(e.getMessage());
             Category categoryError = new Category();
@@ -120,6 +124,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     /**
      * It update a category of database - Service
+     *
      * @param category to update
      * @return category updated in database
      */
@@ -130,7 +135,7 @@ public class CategoryServiceImpl implements CategoryService {
 
             boolean exist = repository.existsById(id);
 
-            if (!exist){
+            if (!exist) {
                 Category categoryError = new Category();
                 categoryError.setId(-404L);
                 return categoryError;
@@ -138,7 +143,7 @@ public class CategoryServiceImpl implements CategoryService {
 
             return repository.save(category);
 
-        }catch (Exception e){
+        } catch (Exception e) {
 
             log.error(e.getMessage());
             Category categoryError = new Category();
@@ -150,11 +155,12 @@ public class CategoryServiceImpl implements CategoryService {
 
     /**
      * Delete category of database by ID - Service
+     *
      * @param id category primary key that you want to delete
      * @return Optional<Boolean>
      */
     @Override
-    public Optional<Boolean> deleteOne(Long id){
+    public Optional<Boolean> deleteOne(Long id) {
 
         try {
             if (id != null && repository.existsById(id)) {
@@ -171,7 +177,7 @@ public class CategoryServiceImpl implements CategoryService {
                 return Optional.of(true);
             }
             return Optional.of(false);
-        }catch (Exception e){
+        } catch (Exception e) {
             log.error(e.getMessage());
             return Optional.empty();
         }
@@ -181,5 +187,30 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public Long getTotalCount() {
         return null;
+    }
+
+
+    /**
+     * Find all category by Name - Service
+     *
+     * @return List<String> from total categories for paint a chart
+     */
+    @Override
+    public List<String> findChartCategoriesAllByName() {
+
+        try {
+            List<String> listResult = this.categoryDao.findChartCategoriesAllByName();
+
+            return listResult;
+
+        } catch (Exception e) {
+
+            log.error(e.getMessage());
+            List<String> listsError = new ArrayList<>();
+            listsError.add("-500");
+
+            return listsError;
+        }
+
     }
 }

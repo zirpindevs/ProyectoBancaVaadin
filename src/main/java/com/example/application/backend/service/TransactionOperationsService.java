@@ -5,6 +5,7 @@ import com.example.application.backend.model.transaction.operations.UserDailyBal
 import com.example.application.backend.model.transaction.operations.totalOperations.DailyOperationsResponse;
 import com.example.application.backend.model.transaction.operations.totalTransactions.DailyTransactionResponse;
 
+import java.util.List;
 import java.util.Map;
 
 public interface TransactionOperationsService {
@@ -17,5 +18,8 @@ public interface TransactionOperationsService {
 
     DailyOperationsResponse getAllOperationsByCategoryBankAccount(Long idBankAccount, Map<String, String> map1);
     DailyOperationsResponse getAllOperationsByCategoryCreditCard(Long idCreditCard, Map<String, String> map1);
+
+    List getAllOperationsByCategoryBankAccount(Long idBankAccount);
+
 
     }
