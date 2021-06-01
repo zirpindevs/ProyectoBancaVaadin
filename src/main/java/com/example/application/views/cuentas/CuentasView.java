@@ -31,7 +31,11 @@ import com.example.application.views.main.MainView;
 import com.vaadin.flow.router.RouteAlias;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 
+import javax.annotation.PostConstruct;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,6 +45,7 @@ import java.util.Map;
 public class CuentasView extends HorizontalLayout {
 
     private static Long TEST_USER = 1L;
+    private String nif;
 
     Logger logger = LoggerFactory.getLogger(this.getClass());
     private static final int NOTIFICATION_DEFAULT_DURATION = 5000;
@@ -58,7 +63,7 @@ public class CuentasView extends HorizontalLayout {
 
 
     User miUser = new User();
-    private Binder<CreditCard> creditCardBinder = new BeanValidationBinder<CreditCard>(CreditCard.class);;
+    private Binder<CreditCard> creditCardBinder = new BeanValidationBinder<CreditCard>(CreditCard.class);
 
 
     public CuentasView(UserService userService, BankAccountService bankaccountService, TransactionService transactionService) {
@@ -74,6 +79,16 @@ public class CuentasView extends HorizontalLayout {
 
         //pinta cada bankaccount que tenga el usuario
         bankAccounts.forEach(bankAccount -> add(cardGenerator(bankAccount.getId(), bankAccount.getNumAccount().toString(), bankAccount)));
+    }
+
+    @PostConstruct
+    public void init() {
+        Authentication auth = SecurityContextHolder
+                .getContext()
+                .getAuthentication();
+        UserDetails userDetail = (UserDetails) auth.getPrincipal();
+        this.nif = userDetail.getUsername();
+
     }
 
     /**
