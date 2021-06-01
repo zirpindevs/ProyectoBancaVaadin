@@ -36,6 +36,7 @@ import com.github.appreciated.card.label.SecondaryLabel;
 import com.vaadin.flow.component.ClickEvent;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Text;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
@@ -131,27 +132,41 @@ public class InicioView extends HorizontalLayout {
 
     private void paintLayouts() {
 
-
-
     HorizontalLayout creditcardLayout = new HorizontalLayout();
+
     VerticalLayout graphicsLayout = new VerticalLayout();
     SplitLayout mainLayout = new SplitLayout();
 
-    creditcardLayout.setHeight("50%");
-    graphicsLayout.add(new AreaBarChartExample(), new DonutChartExample());
-    graphicsLayout.setWidth("30%");
+
+    creditcardLayout.setHeight("55%");
+
 
     for(int x = 0; x < creditCards.size(); x++)
         creditcardLayout.add(cardGenerator(creditCards.get(x)));
 
 
+
+        Button buttonTarjetas = new Button("Ver Tarjetas", clickEvent -> createCreditCardButton(clickEvent));
+
+        buttonTarjetas.setThemeName("tertiary-inline");
+        creditcardLayout.add(buttonTarjetas);
+
+        creditcardLayout.setVerticalComponentAlignment(Alignment.START,
+                buttonTarjetas);
+        creditcardLayout.setSpacing(true);
+
+        //CREATE LAYOUT WITH CREDITCARDS AND GRID
         SplitLayout leftLayout = new SplitLayout();
         leftLayout.setOrientation(SplitLayout.Orientation.VERTICAL);
         leftLayout.addToPrimary(creditcardLayout);
         leftLayout.addToSecondary(createViewLayout());
         leftLayout.setWidth("70%");
 
+        //ADD GRAPHICS CHARTS
+        graphicsLayout.add(new AreaBarChartExample(), new DonutChartExample());
+        graphicsLayout.setWidth("40%");
 
+        //ADD MAIN LAYOUT LEFTLAYOUT AND GRAPHICS
         mainLayout.setSizeFull();
         mainLayout.addToPrimary(leftLayout);
         mainLayout.addToSecondary(graphicsLayout);
@@ -160,6 +175,16 @@ public class InicioView extends HorizontalLayout {
 
     }
 
+    private void createCreditCardButton(ClickEvent e) {
+
+        try {
+            UI.getCurrent().navigate("tarjetas");
+        } catch (Exception ex) {
+            logger.error(ex.getMessage());
+
+            Notification.show(ex.getMessage());
+        }
+    }
 
     /**************************************CREDIT CARD LAYOUT***************************************************************************/
 
