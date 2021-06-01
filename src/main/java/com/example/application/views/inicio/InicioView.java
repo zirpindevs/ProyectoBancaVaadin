@@ -288,7 +288,7 @@ public class InicioView extends HorizontalLayout {
         {
 
             List transactionOperations = transactionOperationsDao.getAllOperationsByCategoryBankAccount(1L);
-            List<String> categoriesName = categoryDao.findAllByName();
+            List<String> categoriesName = categoryDao.findChartCategoriesAllByName();
 
             Series donutSerie = new Series();
 
