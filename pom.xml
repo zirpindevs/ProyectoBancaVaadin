@@ -9,7 +9,7 @@
     <packaging>jar</packaging>
 
     <properties>
-        <java.version>11</java.version>
+        <java.version>15</java.version>
         <vaadin.version>14.6.1</vaadin.version>
     </properties>
 
@@ -203,7 +203,11 @@
             <artifactId>card</artifactId>
             <version>2.0.0</version>
         </dependency>
-
+        <dependency>
+            <groupId>com.github.eirslett</groupId>
+            <artifactId>frontend-plugin-core</artifactId>
+            <version>1.12.0</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -252,6 +256,8 @@
                 <version>3.0.3</version>
             </plugin>
 
+
+
         </plugins>
     </build>
 
@@ -275,6 +281,34 @@
                         </executions>
                         <configuration>
                             <productionMode>true</productionMode>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <id>npm</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.github.eirslett</groupId>
+                        <artifactId>frontend-maven-plugin</artifactId>
+                        <!-- Use the latest released version:
+                        https://repo1.maven.org/maven2/com/github/eirslett/frontend-maven-plugin/ -->
+                        <version>1.12.0</version>
+                        <executions>
+                            <execution>
+                                <id>install node and npm</id>
+                                <goals>
+                                    <goal>install-node-and-npm</goal>
+                                </goals>
+                                <!-- optional: default phase is "generate-resources" -->
+                                <phase>generate-resources</phase>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <nodeVersion>v12.13.0</nodeVersion>
                         </configuration>
                     </plugin>
                 </plugins>
