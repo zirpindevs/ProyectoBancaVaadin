@@ -91,14 +91,24 @@ public class CategoryDaoImpl implements CategoryDao {
     }
 
     @Override
-    public List<String> findAllByName(){
+    public List<String> findChartCategoriesAllByName() {
+        try {
 
         Query queryNative = manager.createNativeQuery(
                 "SELECT name FROM categories order by id"
         );
         List result = queryNative.getResultList();
 
-        return result;
+            return result;
+
+        }catch (Exception e){
+
+            log.error(e.getMessage());
+            List<String> listsError = new ArrayList<>();
+            listsError.add("-500");
+
+            return listsError;
+        }
     }
 
 }

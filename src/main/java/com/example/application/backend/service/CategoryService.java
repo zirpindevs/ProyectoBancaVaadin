@@ -19,4 +19,7 @@ public interface CategoryService {
     Optional<Boolean> deleteOne(Long id);
 
     Long getTotalCount();
+
+    List<String> findChartCategoriesAllByName();
+
 }

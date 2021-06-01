@@ -63,7 +63,6 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     /**
-     *
      * @param idUser
      * @param map1
      * @return
@@ -78,7 +77,7 @@ public class TransactionServiceImpl implements TransactionService {
 
             return new TransactionsUserResponse("-404");
 
-        }catch (Exception e){
+        } catch (Exception e) {
 
             log.error(e.getMessage());
             return new TransactionsUserResponse("-500");
@@ -87,6 +86,7 @@ public class TransactionServiceImpl implements TransactionService {
 
     /**
      * Create a new transaction in database - Service
+     *
      * @param transactionDTO to update
      * @return Transaction created in database
      */
@@ -96,31 +96,33 @@ public class TransactionServiceImpl implements TransactionService {
 
         Transaction transactionValidated = createValidateTransaction(transactionDTO);
 
-        try{
+        try {
 
             transactionValidated.setCreatedDate(Timestamp.from(Instant.now()));
             transactionValidated.setLastModified(Instant.now());
 
             return transactionRepository.save(transactionValidated);
 
-        }catch(Exception e) {
+        } catch (Exception e) {
             log.error(e.getMessage());
             e.printStackTrace();
             Transaction transactiondError = new Transaction();
             transactiondError.setId(-500L);
 
-            return transactiondError;        }
+            return transactiondError;
+        }
 
     }
 
     @Override
     public Transaction createTransactionForm(TransactionDTO transactionDTO) {
-        return  this.createTransaction(transactionDTO);
+        return this.createTransaction(transactionDTO);
     }
 
 
     /**
      * It update a transaction of database - Service
+     *
      * @param transactionDTO to update
      * @return Transaction updated in database
      */
@@ -133,7 +135,7 @@ public class TransactionServiceImpl implements TransactionService {
 
             Transaction transactionValidated = updateValidateTransaction(id, transactionDTO);
 
-            if (transactionValidated.getId() == null){
+            if (transactionValidated.getId() == null) {
                 Transaction transactionError = new Transaction();
                 transactionError.setId(-404L);
                 return transactionError;
@@ -142,7 +144,7 @@ public class TransactionServiceImpl implements TransactionService {
 
             return transactionRepository.save(transactionValidated);
 
-        }catch (Exception e){
+        } catch (Exception e) {
 
             log.error(e.getMessage());
             Transaction transactionError = new Transaction();
@@ -154,7 +156,7 @@ public class TransactionServiceImpl implements TransactionService {
 
 
     @Override
-    public void deleteTransaction(Transaction transactionToDelete){
+    public void deleteTransaction(Transaction transactionToDelete) {
         log.info("REST request to delete an Transaction by id");
         this.transactionRepository.deleteById(transactionToDelete.getId());
 
@@ -162,6 +164,7 @@ public class TransactionServiceImpl implements TransactionService {
 
     /**
      * Create a new transaction in database - Service
+     *
      * @param transactionDTO to update
      * @return Transaction created in database
      */
@@ -173,7 +176,7 @@ public class TransactionServiceImpl implements TransactionService {
         Transaction transactionValidated = createValidateTransaction(transactionDTO);
 */
 
-        try{
+        try {
 
          /*   transactionValidated.setCreatedDate(Timestamp.from(Instant.now()));
             transactionValidated.setLastModified(Instant.now());*/
@@ -183,31 +186,31 @@ public class TransactionServiceImpl implements TransactionService {
 
             return transactionDAO.insertNewTransactionAndUpdateBalance(transactionDTO, bankAccount);
 
-        }catch(Exception e) {
+        } catch (Exception e) {
             log.error(e.getMessage());
             e.printStackTrace();
-            return false;        }
+            return false;
+        }
 
     }
 
     /**
      * Validate a transaction before to save in db
+     *
      * @param transactionDTO
      * @return Transaction
      */
-    private Transaction createValidateTransaction (TransactionDTO transactionDTO){
+    private Transaction createValidateTransaction(TransactionDTO transactionDTO) {
 
         Transaction transactionEmpty = new Transaction();
 
-        if ( transactionDTO.getConcepto() == null || transactionDTO.getImporte() == null || transactionDTO.getTipoMovimiento() == null || ValidateTypeOfMovimiento(transactionDTO.getTipoMovimiento()) != true){
+        if (transactionDTO.getConcepto() == null || transactionDTO.getImporte() == null || transactionDTO.getTipoMovimiento() == null || ValidateTypeOfMovimiento(transactionDTO.getTipoMovimiento()) != true) {
             return transactionEmpty;
         }
-        if ( transactionDTO.getIdBankAccount() == null && transactionDTO.getIdCreditCard() == null){
+        if (transactionDTO.getIdBankAccount() == null && transactionDTO.getIdCreditCard() == null) {
             return transactionEmpty;
-        }
-
-        else {
-             // If passed all validations
+        } else {
+            // If passed all validations
 
             Transaction transaction = new Transaction();
 
@@ -243,16 +246,17 @@ public class TransactionServiceImpl implements TransactionService {
 
     /**
      * Validate a Transaction before to update in db
+     *
      * @param transactionDTO
      * @return Transaction
      */
-    private Transaction updateValidateTransaction (Long id, TransactionDTO transactionDTO){
+    private Transaction updateValidateTransaction(Long id, TransactionDTO transactionDTO) {
 
-        if ( transactionDTO.getConcepto() == null || transactionDTO.getImporte() == null || transactionDTO.getTipoMovimiento() == null || transactionDTO.getCreatedDate() == null){
+        if (transactionDTO.getConcepto() == null || transactionDTO.getImporte() == null || transactionDTO.getTipoMovimiento() == null || transactionDTO.getCreatedDate() == null) {
             return new Transaction();
 
 
-            }else {
+        } else {
 
             // Exist ?
             Optional<Transaction> transactionDB = this.transactionRepository.findById(id);
@@ -304,17 +308,18 @@ public class TransactionServiceImpl implements TransactionService {
 
     /**
      * Set the current balance in the BankAccounts and Transaction before an operation
+     *
      * @param transaction
      * @return Transaction
      */
-    private Transaction currentBalance (Transaction transaction) {
+    private Transaction currentBalance(Transaction transaction) {
 
 
-        if(transaction.getTipoMovimiento().equals(MovimientoType.PAGO) || transaction.getTipoMovimiento().equals(MovimientoType.RECIBO)){
+        if (transaction.getTipoMovimiento().equals(MovimientoType.PAGO) || transaction.getTipoMovimiento().equals(MovimientoType.RECIBO)) {
             transaction.getBankAccount().setBalance(transaction.getBankAccount().getBalance() - transaction.getImporte());
         }
         if (transaction.getTipoMovimiento().equals(MovimientoType.TRANSFERENCIA) || transaction.getTipoMovimiento().equals(MovimientoType.ABONO)) {
-            transaction.getBankAccount().setBalance( transaction.getBankAccount().getBalance() + transaction.getImporte());
+            transaction.getBankAccount().setBalance(transaction.getBankAccount().getBalance() + transaction.getImporte());
         }
         transaction.setBalanceAfterTransaction(transaction.getBankAccount().getBalance());
 
@@ -323,131 +328,14 @@ public class TransactionServiceImpl implements TransactionService {
 
     /**
      * Check if the type of movimiento is a right field
+     *
      * @param movimientoType
      * @return Boolean
      */
-    private Boolean ValidateTypeOfMovimiento(Enum movimientoType){
+    private Boolean ValidateTypeOfMovimiento(Enum movimientoType) {
 
         return (movimientoType).equals(MovimientoType.PAGO) || movimientoType.equals(MovimientoType.RECIBO) || movimientoType.equals(MovimientoType.TRANSFERENCIA) || movimientoType.equals(MovimientoType.ABONO);
-        }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    }
 
 
     /****************************************************************************************************
@@ -461,6 +349,7 @@ public class TransactionServiceImpl implements TransactionService {
 
     /**
      * Get transactions by creditcard ID - Service
+     *
      * @param idCreditcard id creditcard id of transactions : Long
      * @return List<Transaction> from database
      */
@@ -474,13 +363,32 @@ public class TransactionServiceImpl implements TransactionService {
 
             return new TransactionsCreditcardResponse("-404");
 
-        }catch (Exception e){
+        } catch (Exception e) {
 
             log.error(e.getMessage());
             return new TransactionsCreditcardResponse("-500");
         }
     }
 
+    /**
+     * Get balance after transaction  by User ID - Service
+     *
+     * @param idUser id user id of transactions : Long
+     * @returnObject[] from database format to a chart
+     */
+    @Override
+    public Object[] findAllBalanceAfterTransaction(Long idUser) {
 
+        try {
 
+            if (idUser != null)
+                return (Object[]) this.transactionDAO.findAllBalanceAfterTransaction(idUser);
+
+        } catch (Exception e) {
+
+            log.error(e.getMessage());
+            return null;
+        }
+        return null;
+    }
 }

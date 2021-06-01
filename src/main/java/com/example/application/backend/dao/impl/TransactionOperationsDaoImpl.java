@@ -187,7 +187,7 @@ public class TransactionOperationsDaoImpl implements TransactionOperationsDao {
     @Override
     public List getAllOperationsByCategoryBankAccount(Long idBankAccount) {
 
-
+        try {
                 Query queryNative = manager.createNativeQuery(
                         "SELECT COUNT(id) AS totalTransactions from transactions " +
                                 "WHERE `id_bank_account` = " + idBankAccount
@@ -195,9 +195,12 @@ public class TransactionOperationsDaoImpl implements TransactionOperationsDao {
                 );
                 List result = queryNative.getResultList();
 
-                                return result;
+                 return result;
 
-
+        }catch (Exception e){
+            log.error(e.getMessage());
+            return new ArrayList<>();
+        }
     }
 
 }

@@ -1,9 +1,8 @@
 package com.example.application.views.chart;
 
-import com.example.application.backend.dao.CategoryDao;
-import com.example.application.backend.dao.TransactionDAO;
-import com.example.application.backend.dao.TransactionOperationsDao;
 import com.example.application.backend.model.Transaction;
+import com.example.application.backend.service.CategoryService;
+import com.example.application.backend.service.TransactionOperationsService;
 import com.example.application.backend.service.TransactionService;
 import com.example.application.views.main.MainView;
 import com.github.appreciated.apexcharts.ApexCharts;
@@ -32,15 +31,13 @@ public class ChartView extends HorizontalLayout {
 	Series testSeries = new Series();
 	Transaction transactionTest = new Transaction();
 	TransactionService transactionService;
-	TransactionDAO transactionDAO;
-	TransactionOperationsDao transactionOperationsDao;
-	CategoryDao categoryDao;
+	TransactionOperationsService transactionOperationsService;
+	CategoryService categoryService;
 
-	public ChartView(TransactionService transactionService, TransactionDAO transactionDAO, TransactionOperationsDao transactionOperationsDao, CategoryDao categoryDao){
+	public ChartView(TransactionService transactionService, CategoryService categoryService, TransactionOperationsService transactionOperationsService){
 		this.transactionService = transactionService;
-		this.transactionDAO = transactionDAO;
-		this.transactionOperationsDao = transactionOperationsDao;
-		this.categoryDao = categoryDao;
+		this.categoryService = categoryService;
+		this.transactionOperationsService = transactionOperationsService;
 		this.setSizeFull();
 		this.setPadding(true);
 
@@ -51,7 +48,7 @@ public class ChartView extends HorizontalLayout {
 	public class AreaBarChartExample extends Div {
 		public AreaBarChartExample() {
 
-			Object transactionTest = transactionDAO.findAllBalanceAfterTransaction(1L);
+			Object transactionTest = transactionService.findAllBalanceAfterTransaction(1L);
 			Series testserie = new Series();
 			testserie.setData((Object[]) transactionTest);
 
@@ -83,8 +80,8 @@ public class ChartView extends HorizontalLayout {
 				public DonutChartExample()
 				{
 
-					List transactionOperations = transactionOperationsDao.getAllOperationsByCategoryBankAccount(1L);
-					List<String> categoriesName = categoryDao.findAllByName();
+					List transactionOperations = transactionOperationsService.getAllOperationsByCategoryBankAccount(1L);
+					List<String> categoriesName = categoryService.findChartCategoriesAllByName();
 
 					Series donutSerie = new Series();
 
