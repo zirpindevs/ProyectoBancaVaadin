@@ -1,4 +1,4 @@
-package com.example.application.backend.config.securitylogin;
+package com.example.application.backend.config;
 
 import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
 
@@ -15,11 +15,11 @@ class CustomRequestCache extends HttpSessionRequestCache {
 	 * If the method is considered an internal request from the framework, we skip
 	 * saving it.
 	 *
-	 * @see org.vaadin.paul.spring.app.security.SecurityUtils#isFrameworkInternalRequest(HttpServletRequest)
+	 * @see SecurityUtils#isFrameworkInternalRequest(HttpServletRequest)
 	 */
 	@Override
 	public void saveRequest(HttpServletRequest request, HttpServletResponse response) {
-		if (!com.example.application.backend.config.securitylogin.SecurityUtils.isFrameworkInternalRequest(request)) {
+		if (!SecurityUtils.isFrameworkInternalRequest(request)) {
 			super.saveRequest(request, response);
 		}
 	}

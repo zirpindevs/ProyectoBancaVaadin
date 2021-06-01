@@ -1,17 +1,20 @@
 package com.example.application.views.login;
 
+import com.example.application.backend.payload.request.LoginRequest;
+import com.example.application.backend.payload.response.JwtResponse;
+import com.example.application.backend.repository.UserRepository;
+import com.example.application.backend.security.jwt.JwtTokenUtil;
+import com.example.application.backend.security.service.UserDetailsServiceImpl;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.page.Viewport;
 import com.vaadin.flow.router.BeforeLeaveEvent;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
 import com.example.application.backend.model.User;
-import com.example.application.backend.service.UserAuthenticationDAO;
 
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.Label;
@@ -21,6 +24,15 @@ import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.spring.annotation.UIScope;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.RequestBody;
+import springfox.documentation.swagger.web.SecurityConfiguration;
 
 
 @Route(value = "login")
@@ -29,7 +41,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 @UIScope
 public class LoginView extends HorizontalLayout {
 
-    private UserAuthenticationDAO userAuthenticationDAO;
+   // private UserAuthenticationDAO userAuthenticationDAO;
+
+    private UserDetailsServiceImpl userDetailsService;
 
     public static final String NAME = "login";
     private Binder<User> userBinder = new Binder<>();
@@ -39,12 +53,33 @@ public class LoginView extends HorizontalLayout {
     private Button signInButton = new Button("Sign in", e ->  signIn(user));
     private Label newUserLabel = new Label("<span style='cursor: pointer; color:blue'>new user?</span>");
 
-
+    //**************************************************************************************************
+    @Autowired
+    AuthenticationManager authenticationManager;
 
     @Autowired
+    UserRepository userRepository;
+
+    @Autowired
+    PasswordEncoder encoder;
+
+    @Autowired
+    JwtTokenUtil jwtTokenUtil;
+
+
+    //**************************************************************************************************
+
+
+/*    @Autowired
     public void setUserAuthenticationDAO(UserAuthenticationDAO userAuthenticationDAO){
 
         this.userAuthenticationDAO = userAuthenticationDAO;
+    }*/
+
+    @Autowired
+    public void setUserDetailsService(UserDetailsServiceImpl userDetailsService){
+
+        this.userDetailsService = userDetailsService;
     }
 
     public LoginView(){
@@ -78,14 +113,33 @@ public class LoginView extends HorizontalLayout {
      */
     private void signIn(User userRequest){
 
-        if(userAuthenticationDAO.checkAuthentication(userRequest)){
-
+        LoginRequest userLogin = new LoginRequest();
+        userLogin.setNif(userRequest.getNif());
+        userLogin.setPassword(userRequest.getPassword());
+        try{
+            JwtResponse token = this.authenticateUser(userLogin);
             UI.getCurrent().navigate("cuentas");
-            Notification.show("Autenticado");
-        } else{
+       //     SecurityConfiguration.getUserDetails().getUsername()
 
-            Notification.show("Invalid user name or password");
+        }catch (Exception e){
+            e.printStackTrace();
+            Notification.show("Usuario o contraseña incorrecta");
         }
+
+    }
+
+    public JwtResponse authenticateUser( LoginRequest loginRequest){
+
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(loginRequest.getNif(), loginRequest.getPassword()));
+
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        String jwt = jwtTokenUtil.generateJwtToken(authentication);
+
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        String nif = userDetails.getUsername();
+
+        return new JwtResponse(jwt);
     }
 
    // @Override

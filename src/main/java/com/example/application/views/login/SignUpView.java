@@ -1,7 +1,6 @@
 package com.example.application.views.login;
 
 import com.example.application.backend.model.User;
-import com.example.application.backend.service.UserAuthenticationDAO;
 
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.formlayout.FormLayout;
@@ -22,7 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 @UIScope
 public class SignUpView extends HorizontalLayout {
 
-    private UserAuthenticationDAO userAuthenticationDAO;
+ //   private UserAuthenticationDAO userAuthenticationDAO;
 
     public static final String NAME = "sign_up";
     private Binder<User> userBinder = new Binder<>();
@@ -32,11 +31,11 @@ public class SignUpView extends HorizontalLayout {
     private PasswordField passwordTextField = new PasswordField("Password");
     private Button signUpButton = new Button("Sign up", e -> signUp(user));
 
-    @Autowired
+  /*  @Autowired
     public void setUserAuthenticationDAO(UserAuthenticationDAO userAuthenticationDAO){
 
         this.userAuthenticationDAO = userAuthenticationDAO;
-    }
+    }*/
 
     public SignUpView(){
 
@@ -69,14 +68,14 @@ public class SignUpView extends HorizontalLayout {
      */
     private void signUp(User userRequest){
 
-        try {
+      /*  try {
             userAuthenticationDAO.addNewUser(userRequest);
           //  navigator.navigateTo(LoginView.NAME);
         } catch (Exception e){
 
          //   Notification.show("Sign up failed: " + e.getMessage(),
         //            Notification.Type.ERROR_MESSAGE);
-        }
+        }*/
     }
 
 /*    @Override

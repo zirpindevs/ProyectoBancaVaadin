@@ -1,4 +1,4 @@
-package com.example.application.backend.config.securitylogin;
+package com.example.application.backend.config;
 
 import com.vaadin.flow.server.ServletHelper.RequestType;
 import com.vaadin.flow.shared.ApplicationConstants;
