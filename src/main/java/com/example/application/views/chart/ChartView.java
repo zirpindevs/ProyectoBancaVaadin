@@ -115,6 +115,11 @@ public class ChartView extends HorizontalLayout {
 						listaDouble.add(Double.valueOf(listaString.get(x)));
 					}
 
+					if(listaDouble.size() < 5){
+						for (int y = listaDouble.size(); y < 5; y++)
+							listaDouble.add(0D);
+					}
+
 					ApexCharts donutChart = ApexChartsBuilder.get()
 							.withChart(ChartBuilder.get().withType(Type.donut).build())
 							.withLegend(LegendBuilder.get()

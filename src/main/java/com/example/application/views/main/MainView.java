@@ -50,6 +50,7 @@ public class MainView extends AppLayout {
 
     public MainView(UserDetailsServiceImpl userDetailsService) {
         this.userDetailsService = userDetailsService;
+
         this.userLogged = userDetailsService.getUserLogged();
 
         setPrimarySection(Section.DRAWER);

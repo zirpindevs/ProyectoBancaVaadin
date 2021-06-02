@@ -309,6 +309,11 @@ public class InicioView extends HorizontalLayout {
                 listaDouble.add(Double.valueOf(listaString.get(x)));
             }
 
+            if(listaDouble.size() < 5){
+                for (int y = listaDouble.size(); y < 5; y++)
+                    listaDouble.add(0D);
+            }
+
             ApexCharts donutChart = ApexChartsBuilder.get()
                     .withChart(ChartBuilder.get().withType(Type.donut).build())
                     .withLegend(LegendBuilder.get()
@@ -417,7 +422,6 @@ public class InicioView extends HorizontalLayout {
 
     private void loadGrid() {
         transactionGridProvider =  DataProvider.ofCollection(this.transactions);
-        //warehouseProvider.setSortOrder(Warehouse::getName, SortDirection.ASCENDING);
 
         gridTransactions.setDataProvider(transactionGridProvider);
     }
