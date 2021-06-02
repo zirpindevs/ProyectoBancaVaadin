@@ -5,6 +5,7 @@ import com.example.application.backend.model.Transaction;
 import com.example.application.backend.model.TransactionDTO;
 import com.example.application.backend.model.User;
 import com.example.application.backend.model.transaction.operations.TransactionsCreditcardResponse;
+import com.example.application.backend.security.service.UserDetailsServiceImpl;
 import com.example.application.backend.service.CreditCardService;
 import com.example.application.backend.service.TransactionService;
 import com.example.application.backend.service.UserService;
@@ -37,6 +38,10 @@ public class TarjetasView extends HorizontalLayout {
     Logger logger = LoggerFactory.getLogger(this.getClass());
     private static final int NOTIFICATION_DEFAULT_DURATION = 5000;
 
+    private UserDetailsServiceImpl userDetailsService;
+
+    private static User userLogged;
+
     private UserService userService;
     private CreditCardService creditCardService;
     private TransactionService transactionService;
@@ -47,19 +52,20 @@ public class TarjetasView extends HorizontalLayout {
     private List<CreditCard> creditCards;
     private List<Transaction> transactions;
 
-
-
-    User miUser = new User();
     private Binder<CreditCard> creditCardBinder = new BeanValidationBinder<CreditCard>(CreditCard.class);;
 
 
-    public TarjetasView(UserService userService, CreditCardService creditCardService, TransactionService transactionService) {
+    public TarjetasView(UserService userService, CreditCardService creditCardService, TransactionService transactionService, UserDetailsServiceImpl userDetailsService) {
   /*      this.setSizeFull();
         this.setPadding(true);*/
 
+        this.userDetailsService = userDetailsService;
         this.userService = userService;
         this.creditCardService = creditCardService;
         this.transactionService = transactionService;
+
+        this.userLogged = userDetailsService.getUserLogged();
+
 
         loadData();
 
@@ -72,9 +78,7 @@ public class TarjetasView extends HorizontalLayout {
 
         try {
 
-            miUser = userService.findOne(1L).get();
-
-            this.creditCards = creditCardService.findbyUser(miUser.getId());
+            this.creditCards = creditCardService.findbyUser(this.userLogged.getId());
 
         }
         catch(Exception ex) {
