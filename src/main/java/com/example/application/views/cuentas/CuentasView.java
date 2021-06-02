@@ -48,7 +48,6 @@ import java.util.Map;
 @PageTitle("Cuentas")
 public class CuentasView extends HorizontalLayout {
 
-    @Autowired
     private UserDetailsServiceImpl userDetailsService;
 
     private static User userLogged;
@@ -67,17 +66,7 @@ public class CuentasView extends HorizontalLayout {
     BankAccountUserResponse bankAccountUserResponse;
 
 
-
-    User miUser = new User();
-    private Binder<CreditCard> creditCardBinder = new BeanValidationBinder<CreditCard>(CreditCard.class);
-
-
     public CuentasView(UserService userService, BankAccountService bankaccountService, TransactionService transactionService, UserDetailsServiceImpl userDetailsService) {
-  /*      this.setSizeFull();
-        this.setPadding(true);*/
-/*
-        userLogged = userDetailsService.getUserLogged();
-        System.out.println(userLogged.toString());*/
 
         this.userService = userService;
         this.bankAccountService = bankaccountService;
@@ -85,14 +74,13 @@ public class CuentasView extends HorizontalLayout {
         this.userDetailsService = userDetailsService;
 
         this.userLogged = userDetailsService.getUserLogged();
-        System.out.println(userLogged.toString());
 
 
         loadDataAllTransactions();
 
 
         //pinta cada bankaccount que tenga el usuario
-        bankAccounts.forEach(bankAccount -> add(cardGenerator(bankAccount.getId(), bankAccount.getNumAccount().toString(), bankAccount)));
+        bankAccounts.forEach(bankAccount -> add(cardGenerator(bankAccount)));
 
     }
 
@@ -136,9 +124,6 @@ public class CuentasView extends HorizontalLayout {
             this.bankAccountUserResponse = bankAccountService.findAllBankAccountsByIdUser(this.userLogged.getId());
             this.bankAccounts = this.bankAccountUserResponse.getBankAccounts();
 
-//            for (int i = 0; i < this.transactions.size(); i++){
-//
-//            }
 
         }
         catch(Exception e) {
@@ -148,7 +133,7 @@ public class CuentasView extends HorizontalLayout {
     }
 
 
-    public Component cardGenerator(Long idCreditCard, String numBankAccount, BankAccount bankAccount) {
+    public Component cardGenerator(BankAccount bankAccount) {
 
 /*
         String maskedNumbers = maskCardNumber(numCreditCard);
@@ -166,26 +151,12 @@ public class CuentasView extends HorizontalLayout {
         map1.put("page", "0");
         map1.put("limit", "50");
 
-       /* TransactionsCreditcardResponse balanceTarjeta = transactionService.findAllTransactionsByDateRangeByIdCreditcard(idCreditCard, map1);
-
-        List<TransactionDTO> transactionsTarjetas = balanceTarjeta.getTransactions();
-
-        Double saldoTarjeta = 0D;
-
-        for(int x=0; x<transactionsTarjetas.size();x++) {
-
-            if(transactionsTarjetas.get(x).getTipoMovimiento().name().equals("PAGO") || transactionsTarjetas.get(x).getTipoMovimiento().name().equals("RECIBO"))
-                saldoTarjeta = saldoTarjeta + transactionsTarjetas.get(x).getImporte();
-        }
-*/
-
-
 
         Card card = new Card(
                 // if you don't want the title to wrap you can set the whitespace = nowrap
                 logoBanco,
                 new PrimaryLabel(bankAccount.getBalance().toString()+" €"),
-                new SecondaryLabel(numBankAccount),
+                new SecondaryLabel(bankAccount.getNumAccount()),
 /*
                 new IconItem(getIcon(cardProvider), ""),
 */
