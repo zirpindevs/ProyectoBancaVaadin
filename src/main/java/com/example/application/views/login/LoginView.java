@@ -26,8 +26,6 @@ import com.vaadin.flow.spring.annotation.UIScope;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
-
-
 @Route(value = "login")
 @PageTitle("Login")
 @UIScope
@@ -72,7 +70,6 @@ public class LoginView extends VerticalLayout {
 
 
         logInPageLayout.setAlignItems(Alignment.CENTER);
-       // logInPageLayout.setComponentAlignment(logInFormLayout, Alignment.TOP_CENTER);
 
         // Bind the user object to text fields for reading in form inputs
         userBinder.bind(userNameTextField, User::getNif, User::setNif);

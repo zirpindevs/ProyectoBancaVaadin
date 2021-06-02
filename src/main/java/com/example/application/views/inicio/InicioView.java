@@ -12,23 +12,19 @@ import com.example.application.backend.model.transaction.operations.Transactions
 import com.example.application.backend.model.transaction.operations.TransactionsUserResponse;
 import com.example.application.backend.security.service.UserDetailsServiceImpl;
 import com.example.application.backend.service.*;
-import com.example.application.views.tarjetas.form.CreditCardForm;
+
 import com.github.appreciated.apexcharts.ApexCharts;
 import com.github.appreciated.apexcharts.ApexChartsBuilder;
 import com.github.appreciated.apexcharts.config.builder.*;
 import com.github.appreciated.apexcharts.config.chart.Type;
-import com.github.appreciated.apexcharts.config.chart.builder.ZoomBuilder;
-import com.github.appreciated.apexcharts.config.legend.HorizontalAlign;
+
 import com.github.appreciated.apexcharts.config.legend.Position;
 import com.github.appreciated.apexcharts.config.plotoptions.builder.BarBuilder;
 import com.github.appreciated.apexcharts.config.responsive.builder.OptionsBuilder;
-import com.github.appreciated.apexcharts.config.stroke.Curve;
-import com.github.appreciated.apexcharts.config.subtitle.Align;
-import com.github.appreciated.apexcharts.config.xaxis.XAxisType;
+
 import com.github.appreciated.apexcharts.helper.Series;
 import com.github.appreciated.card.Card;
-import com.github.appreciated.card.action.ActionButton;
-import com.github.appreciated.card.action.Actions;
+
 import com.github.appreciated.card.content.IconItem;
 import com.github.appreciated.card.label.PrimaryLabel;
 import com.github.appreciated.card.label.SecondaryLabel;
@@ -37,8 +33,7 @@ import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.checkbox.Checkbox;
+
 import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
@@ -52,8 +47,7 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.splitlayout.SplitLayout;
 import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.data.provider.ListDataProvider;
-import com.vaadin.flow.data.provider.SortDirection;
-import com.vaadin.flow.data.renderer.ComponentRenderer;
+
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.PageTitle;
 import com.example.application.views.main.MainView;
@@ -61,12 +55,11 @@ import com.vaadin.flow.router.RouteAlias;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.IntStream;
+
 
 @Route(value = "inicio", layout = MainView.class)
 @RouteAlias(value = "inicio", layout = MainView.class)
@@ -126,7 +119,6 @@ public class InicioView extends HorizontalLayout {
         // load data from service
 
         this.creditCards = creditCardService.findbyUser(this.userLogged.getId());
-
 
         // load data from service
         loadDataAllTransactions();

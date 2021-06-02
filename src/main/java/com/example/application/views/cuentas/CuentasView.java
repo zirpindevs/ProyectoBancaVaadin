@@ -1,45 +1,36 @@
 package com.example.application.views.cuentas;
 
-import com.example.application.backend.config.SecurityConfig;
 import com.example.application.backend.model.*;
 import com.example.application.backend.model.bankaccount.operations.BankAccountUserResponse;
 import com.example.application.backend.model.transaction.operations.TransactionsCreditcardResponse;
-import com.example.application.backend.model.transaction.operations.TransactionsUserResponse;
+
 import com.example.application.backend.security.service.UserDetailsServiceImpl;
 import com.example.application.backend.service.BankAccountService;
-import com.example.application.backend.service.CreditCardService;
+
 import com.example.application.backend.service.TransactionService;
 import com.example.application.backend.service.UserService;
 import com.example.application.views.cuentas.form.AccountForm;
-import com.example.application.views.tarjetas.form.CreditCardForm;
+
 import com.github.appreciated.card.Card;
 import com.github.appreciated.card.action.ActionButton;
 import com.github.appreciated.card.action.Actions;
-import com.github.appreciated.card.content.IconItem;
+
 import com.github.appreciated.card.label.PrimaryLabel;
 import com.github.appreciated.card.label.SecondaryLabel;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
-import com.vaadin.flow.component.button.Button;
+
 import com.vaadin.flow.component.html.Image;
-import com.vaadin.flow.component.notification.Notification;
+
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.data.binder.BeanValidationBinder;
-import com.vaadin.flow.data.binder.Binder;
+
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.PageTitle;
 import com.example.application.views.main.MainView;
-import com.vaadin.flow.router.RouteAlias;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 
-import javax.annotation.PostConstruct;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -111,9 +102,6 @@ public class CuentasView extends HorizontalLayout {
 
     public Component cardGenerator(BankAccount bankAccount) {
 
-/*
-        String maskedNumbers = maskCardNumber(numCreditCard);
-*/
         HorizontalLayout cardLayout = new HorizontalLayout();
 
         Image logoBanco = new Image();

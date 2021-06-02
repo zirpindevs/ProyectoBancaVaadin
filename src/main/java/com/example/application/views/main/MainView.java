@@ -144,9 +144,6 @@ public class MainView extends AppLayout {
 
         // get security context
         Avatar avatar = new Avatar();
-/*
-        avatar.setName(SecurityConfiguration.getUserDetails().getUsername());
-*/
         avatar.setName(this.userLogged.getName());
 
 

@@ -56,8 +56,6 @@ public class TarjetasView extends HorizontalLayout {
 
 
     public TarjetasView(UserService userService, CreditCardService creditCardService, TransactionService transactionService, UserDetailsServiceImpl userDetailsService) {
-  /*      this.setSizeFull();
-        this.setPadding(true);*/
 
         this.userDetailsService = userDetailsService;
         this.userService = userService;
