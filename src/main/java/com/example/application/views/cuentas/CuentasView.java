@@ -84,30 +84,6 @@ public class CuentasView extends HorizontalLayout {
 
     }
 
-/*    @PostConstruct
-    public void init() {
-        Authentication auth = SecurityContextHolder
-                .getContext()
-                .getAuthentication();
-     //   this.nif = user.getUsername();
-       // UserDetails userDetail = (UserDetails) auth.getPrincipal();
-      //  this.nif = userDetail.getUsername();
-       // System.out.println(this.nif);
-      //  Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-     //   String currentPrincipalName = authentication.getName();
-    //    System.out.println(currentPrincipalName);
-
-        this.userLogged = userDetailsService.getUserLogged();
-        System.out.println(userLogged.toString());
-
-
-        loadDataAllTransactions();
-
-
-        //pinta cada bankaccount que tenga el usuario
-        bankAccounts.forEach(bankAccount -> add(cardGenerator(bankAccount.getId(), bankAccount.getNumAccount().toString(), bankAccount)));
-    }*/
-
     /**
      * Load Data with all Transactions of all bank accounts of a user
      */
@@ -157,9 +133,6 @@ public class CuentasView extends HorizontalLayout {
                 logoBanco,
                 new PrimaryLabel(bankAccount.getBalance().toString()+" €"),
                 new SecondaryLabel(bankAccount.getNumAccount()),
-/*
-                new IconItem(getIcon(cardProvider), ""),
-*/
                 new Actions(
                         new ActionButton("Transferencias", event -> {
 

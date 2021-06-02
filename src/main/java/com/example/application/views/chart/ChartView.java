@@ -1,6 +1,12 @@
 package com.example.application.views.chart;
 
+import com.example.application.backend.model.BankAccount;
 import com.example.application.backend.model.Transaction;
+import com.example.application.backend.model.User;
+import com.example.application.backend.model.bankaccount.operations.BankAccountUserResponse;
+import com.example.application.backend.repository.BankAccountRepository;
+import com.example.application.backend.security.service.UserDetailsServiceImpl;
+import com.example.application.backend.service.BankAccountService;
 import com.example.application.backend.service.CategoryService;
 import com.example.application.backend.service.TransactionOperationsService;
 import com.example.application.backend.service.TransactionService;
@@ -28,27 +34,41 @@ import java.util.List;
 @PageTitle("Balance")
 public class ChartView extends HorizontalLayout {
 
-	Series testSeries = new Series();
-	Transaction transactionTest = new Transaction();
-	TransactionService transactionService;
-	TransactionOperationsService transactionOperationsService;
-	CategoryService categoryService;
+	private UserDetailsServiceImpl userDetailsService;
 
-	public ChartView(TransactionService transactionService, CategoryService categoryService, TransactionOperationsService transactionOperationsService){
+	private static User userLogged;
+
+	private Transaction transactionTest = new Transaction();
+	private TransactionService transactionService;
+	private TransactionOperationsService transactionOperationsService;
+	private CategoryService categoryService;
+	private BankAccountService bankAccountService;
+
+	Series testSeries = new Series();
+
+
+	public ChartView(TransactionService transactionService, CategoryService categoryService, TransactionOperationsService transactionOperationsService,
+					 UserDetailsServiceImpl userDetailsService, BankAccountService bankAccountService){
 		this.transactionService = transactionService;
 		this.categoryService = categoryService;
 		this.transactionOperationsService = transactionOperationsService;
+		this.userDetailsService = userDetailsService;
+		this.bankAccountService = bankAccountService;
+
 		this.setSizeFull();
 		this.setPadding(true);
 
-		add(new AreaBarChartExample(), new DonutChartExample());
+		this.userLogged = userDetailsService.getUserLogged();
+
+
+		add(new AreaBarChartExample(this.userLogged), new DonutChartExample(this.userLogged));
 
 	}
 
 	public class AreaBarChartExample extends Div {
-		public AreaBarChartExample() {
+		public AreaBarChartExample(User userLogged) {
 
-			Object transactionTest = transactionService.findAllBalanceAfterTransaction(1L);
+			Object transactionTest = transactionService.findAllBalanceAfterTransaction(userLogged.getId());
 			Series testserie = new Series();
 			testserie.setData((Object[]) transactionTest);
 
@@ -77,10 +97,12 @@ public class ChartView extends HorizontalLayout {
 
 
 			public class DonutChartExample extends Div {
-				public DonutChartExample()
+				public DonutChartExample(User userLogged)
 				{
+					BankAccountUserResponse bankAccountUserResponse = bankAccountService.findAllBankAccountsByIdUser(userLogged.getId());
 
-					List transactionOperations = transactionOperationsService.getAllOperationsByCategoryBankAccount(1L);
+
+					List transactionOperations = transactionOperationsService.getAllOperationsByCategoryBankAccount(bankAccountUserResponse.getBankAccounts().get(0).getId());
 					List<String> categoriesName = categoryService.findChartCategoriesAllByName();
 
 					Series donutSerie = new Series();
