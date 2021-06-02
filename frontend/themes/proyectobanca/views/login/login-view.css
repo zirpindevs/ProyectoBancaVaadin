@@ -1,0 +1,20 @@
+
+.principal-layout{
+background: linear-gradient(180deg, rgba(208, 30, 105, 0.17) 0%, rgba(255, 0, 107, 0) 100%);
+}
+
+.logo-image{
+margin-top: 200px;
+}
+.logo-image > image{
+
+ width: 250px;
+}
+
+.login-layout{
+
+background: white;
+
+border: 1px solid #D01E69;
+padding: 20px;
+}
