@@ -87,15 +87,13 @@ public class CuentasView extends HorizontalLayout {
         map1.put("limit", "50");
 
         try {
-          //  this.bankAccountUserResponse = bankAccountService.findAllBankAccountsByIdUser(TEST_USER);
+
             this.bankAccountUserResponse = bankAccountService.findAllBankAccountsByIdUser(this.userLogged.getId());
             this.bankAccounts = this.bankAccountUserResponse.getBankAccounts();
 
-
         }
         catch(Exception e) {
-            e.printStackTrace();
-
+            logger.error(e.getMessage());
         }
     }
 

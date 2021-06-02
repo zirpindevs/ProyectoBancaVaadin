@@ -25,6 +25,8 @@ import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.data.provider.Query;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.List;
@@ -45,6 +47,8 @@ public class MovimientosView extends VerticalLayout {
     private ListDataProvider<TransactionGrid> transactionGridProvider;
 
     private Grid<TransactionGrid> gridTransactions = new Grid<>(TransactionGrid.class);
+
+    Logger logger = LoggerFactory.getLogger(this.getClass());
 
     // Services
     private TransactionService transactionService;
@@ -111,8 +115,7 @@ public class MovimientosView extends VerticalLayout {
 
         }
         catch(Exception e) {
-            e.printStackTrace();
-
+            logger.error(e.getMessage());
         }
     }
 

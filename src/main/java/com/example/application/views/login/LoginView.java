@@ -95,7 +95,6 @@ public class LoginView extends VerticalLayout {
 
 
         }catch (Exception e){
-           // e.printStackTrace();
             Notification.show("Usuario o contraseña incorrecta");
         }
 
