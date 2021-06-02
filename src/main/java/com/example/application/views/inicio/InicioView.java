@@ -7,12 +7,11 @@ import com.example.application.backend.model.CreditCard;
 import com.example.application.backend.model.TransactionDTO;
 import com.example.application.backend.model.TransactionGrid;
 import com.example.application.backend.model.User;
+import com.example.application.backend.model.bankaccount.operations.BankAccountUserResponse;
 import com.example.application.backend.model.transaction.operations.TransactionsCreditcardResponse;
 import com.example.application.backend.model.transaction.operations.TransactionsUserResponse;
-import com.example.application.backend.service.BankAccountService;
-import com.example.application.backend.service.CreditCardService;
-import com.example.application.backend.service.TransactionService;
-import com.example.application.backend.service.UserService;
+import com.example.application.backend.security.service.UserDetailsServiceImpl;
+import com.example.application.backend.service.*;
 import com.example.application.views.tarjetas.form.CreditCardForm;
 import com.github.appreciated.apexcharts.ApexCharts;
 import com.github.appreciated.apexcharts.ApexChartsBuilder;
@@ -83,25 +82,30 @@ public class InicioView extends HorizontalLayout {
     private final TransactionDAO transactionDAO;
     private final TransactionOperationsDao transactionOperationsDao;
     private final CategoryDao categoryDao;
+    private TransactionOperationsService transactionOperationsService;
 
 
     Map<String, String> map1 = new HashMap<>();
 
+    private UserDetailsServiceImpl userDetailsService;
+
+    private static User userLogged;
+
     private List<CreditCard> creditCards;
 
-    TransactionsUserResponse allUserTransactions;
+    private TransactionsUserResponse allUserTransactions;
 
-    List<TransactionGrid> transactions;
+    private List<TransactionGrid> transactions;
 
     private ListDataProvider<TransactionGrid> transactionGridProvider;
-    User miUser = new User();
 
     private Grid<TransactionGrid> gridTransactions = new Grid<>(TransactionGrid.class);
 
 
 
     public InicioView(UserService userService, CreditCardService creditCardService, TransactionService transactionService,
-                      BankAccountService bankAccountService, TransactionDAO transactionDAO, TransactionOperationsDao transactionOperationsDao, CategoryDao categoryDao) {
+                      BankAccountService bankAccountService, TransactionDAO transactionDAO, TransactionOperationsDao transactionOperationsDao,
+                      CategoryDao categoryDao,  UserDetailsServiceImpl userDetailsService, TransactionOperationsService transactionOperationsService) {
         super();
         this.transactionService = transactionService;
         this.bankAccountService = bankAccountService;
@@ -110,14 +114,18 @@ public class InicioView extends HorizontalLayout {
         this.transactionDAO = transactionDAO;
         this.transactionOperationsDao = transactionOperationsDao;
         this.categoryDao = categoryDao;
+        this.userDetailsService = userDetailsService;
+        this.transactionOperationsService = transactionOperationsService;
 
         this.setSizeFull();
+
+        this.userLogged = userDetailsService.getUserLogged();
 
         addClassName("inicio-view");
 
         // load data from service
-        miUser = userService.findOne(1L).get();
-        this.creditCards = creditCardService.findbyUser(miUser.getId());
+
+        this.creditCards = creditCardService.findbyUser(this.userLogged.getId());
 
 
         // load data from service
@@ -162,7 +170,7 @@ public class InicioView extends HorizontalLayout {
         leftLayout.setWidth("70%");
 
         //ADD GRAPHICS CHARTS
-        graphicsLayout.add(new AreaBarChartExample(), new DonutChartExample());
+        graphicsLayout.add(new AreaBarChartExample(this.userLogged), new DonutChartExample(this.userLogged));
         graphicsLayout.setWidth("40%");
 
         //ADD MAIN LAYOUT LEFTLAYOUT AND GRAPHICS
@@ -252,9 +260,9 @@ public class InicioView extends HorizontalLayout {
 
 
     public class AreaBarChartExample extends Div {
-        public AreaBarChartExample() {
+        public AreaBarChartExample(User userLogged) {
 
-            Object transactionTest = transactionDAO.findAllBalanceAfterTransaction(1L);
+            Object transactionTest = transactionDAO.findAllBalanceAfterTransaction(userLogged.getId());
             Series testserie = new Series();
             testserie.setData((Object[]) transactionTest);
 
@@ -284,10 +292,11 @@ public class InicioView extends HorizontalLayout {
 
 
     public class DonutChartExample extends Div {
-        public DonutChartExample()
+        public DonutChartExample(User userLogged)
         {
+            BankAccountUserResponse bankAccountUserResponse = bankAccountService.findAllBankAccountsByIdUser(userLogged.getId());
 
-            List transactionOperations = transactionOperationsDao.getAllOperationsByCategoryBankAccount(1L);
+            List transactionOperations = transactionOperationsService.getAllOperationsByCategoryBankAccount(bankAccountUserResponse.getBankAccounts().get(0).getId());
             List<String> categoriesName = categoryDao.findChartCategoriesAllByName();
 
             Series donutSerie = new Series();
@@ -298,6 +307,11 @@ public class InicioView extends HorizontalLayout {
             for(int x = 0; x < transactionOperations.size();x++) {
                 listaString.add(transactionOperations.get(x).toString());
                 listaDouble.add(Double.valueOf(listaString.get(x)));
+            }
+
+            if(listaDouble.size() < 5){
+                for (int y = listaDouble.size(); y < 5; y++)
+                    listaDouble.add(0D);
             }
 
             ApexCharts donutChart = ApexChartsBuilder.get()
@@ -339,7 +353,7 @@ public class InicioView extends HorizontalLayout {
         map1.put("limit", "50");
 
         try {
-            this.allUserTransactions = transactionService.findAllTransactionsByDateRangeByIdUser(3L, map1);
+            this.allUserTransactions = transactionService.findAllTransactionsByDateRangeByIdUser(userLogged.getId(), map1);
             this.transactions = this.allUserTransactions.getTransactions();
 
             final int[] i = {0};
@@ -408,7 +422,6 @@ public class InicioView extends HorizontalLayout {
 
     private void loadGrid() {
         transactionGridProvider =  DataProvider.ofCollection(this.transactions);
-        //warehouseProvider.setSortOrder(Warehouse::getName, SortDirection.ASCENDING);
 
         gridTransactions.setDataProvider(transactionGridProvider);
     }

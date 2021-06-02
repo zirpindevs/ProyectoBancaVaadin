@@ -3,7 +3,7 @@ package com.example.application.views.main;
 import java.util.Optional;
 
 import com.example.application.backend.model.User;
-import com.example.application.backend.repository.UserRepository;
+import com.example.application.backend.security.service.UserDetailsServiceImpl;
 import com.example.application.views.chart.ChartView;
 import com.example.application.views.movimientos.MovimientosView;
 import com.example.application.views.tarjetas.TarjetasView;
@@ -13,8 +13,10 @@ import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.avatar.Avatar;
 import com.vaadin.flow.component.contextmenu.ContextMenu;
+import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.H1;
+import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
@@ -30,11 +32,6 @@ import com.vaadin.flow.theme.Theme;
 import com.vaadin.flow.router.PageTitle;
 import com.example.application.views.cuentas.CuentasView;
 import com.example.application.views.inicio.InicioView;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-
-import javax.annotation.PostConstruct;
 
 /**
  * The main view is a top-level placeholder for other views.
@@ -44,38 +41,37 @@ import javax.annotation.PostConstruct;
 @Theme(themeFolder = "proyectobanca")
 public class MainView extends AppLayout {
 
-    private User loggedUser = new User();
-    private String nif;
+    private UserDetailsServiceImpl userDetailsService;
+    private static User userLogged;
 
     private final Tabs menu;
     private H1 viewTitle;
 
-    private UserRepository userRepository;
 
+    public MainView(UserDetailsServiceImpl userDetailsService) {
+        this.userDetailsService = userDetailsService;
 
-    public MainView(UserRepository userRepository) {
-        this.userRepository = userRepository;
+        this.userLogged = userDetailsService.getUserLogged();
 
         setPrimarySection(Section.DRAWER);
         addToNavbar(true, createHeaderContent());
         menu = createMenu();
         addToDrawer(createDrawerContent(menu));
-    }
 
-    @PostConstruct
-    public void init() {
-        Authentication auth = SecurityContextHolder
-                .getContext()
-                .getAuthentication();
-        UserDetails userDetail = (UserDetails) auth.getPrincipal();
-        this.nif = userDetail.getUsername();
-        loggedUser = userRepository.findOneByNif(this.nif).get();
 
 
     }
 
     private Component createHeaderContent() {
         HorizontalLayout layout = new HorizontalLayout();
+
+        Div nameLayout = new Div();
+
+        nameLayout.add(new Label(userLogged.getName()));
+        nameLayout.add(new Label(" "));
+        nameLayout.add((new Label(userLogged.getLastName())));
+        nameLayout.getElement().getStyle().set("text-align","right");
+
         layout.setId("header");
         layout.setWidthFull();
         layout.setSpacing(false);
@@ -83,7 +79,11 @@ public class MainView extends AppLayout {
         layout.add(new DrawerToggle());
         viewTitle = new H1();
         layout.add(viewTitle);
+
         layout.add(createAvatarMenu());
+        layout.add(nameLayout);
+
+
         return layout;
     }
 
@@ -141,12 +141,13 @@ public class MainView extends AppLayout {
     }
 
     private Component createAvatarMenu() {
+
         // get security context
         Avatar avatar = new Avatar();
 /*
         avatar.setName(SecurityConfiguration.getUserDetails().getUsername());
 */
-        avatar.setName(loggedUser.getName());
+        avatar.setName(this.userLogged.getName());
 
 
         ContextMenu contextMenu = new ContextMenu();
