@@ -353,7 +353,7 @@ public class InicioView extends HorizontalLayout {
         map1.put("limit", "50");
 
         try {
-            this.allUserTransactions = transactionService.findAllTransactionsByDateRangeByIdUser(3L, map1);
+            this.allUserTransactions = transactionService.findAllTransactionsByDateRangeByIdUser(userLogged.getId(), map1);
             this.transactions = this.allUserTransactions.getTransactions();
 
             final int[] i = {0};
