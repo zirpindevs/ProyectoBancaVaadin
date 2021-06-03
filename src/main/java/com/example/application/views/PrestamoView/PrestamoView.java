@@ -135,11 +135,14 @@ public class PrestamoView extends Div implements HasUrlParameter<String> {
         add(createFormLayout());
         add(createButtonLayout());
 
-/*        calcular.addClickListener(e ->
-
+        calcular.addClickListener(e ->
+        {
 
             PrestamoForm prestamoForm = new PrestamoForm(bankAccount, cantidad, tipoDeInteres, duracionSelect);
 
+
+            // open form dialog view
+            prestamoForm.open();
         });
 
 
@@ -149,7 +152,7 @@ public class PrestamoView extends Div implements HasUrlParameter<String> {
                 if(event.getKey().matches("Enter"))
                     calcular.click();
             }
-        });*/
+        });
     }
 
 
