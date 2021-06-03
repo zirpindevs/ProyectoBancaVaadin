@@ -136,7 +136,14 @@ public class CuentasView extends HorizontalLayout {
 
                         })
 
-        )
+        ),
+                new Actions(
+                        new ActionButton("Alta préstamo", event -> {
+                            UI.getCurrent().navigate("prestamo");
+
+                        })
+
+                )
 
         );
         cardLayout.add(card);
