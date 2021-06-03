@@ -4,6 +4,8 @@ import com.example.application.backend.model.*;
 import com.example.application.backend.service.TransactionService;
 import com.example.application.views.main.MainView;
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.ComponentEventListener;
+import com.vaadin.flow.component.KeyPressEvent;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -92,6 +94,24 @@ public class AccountForm extends Dialog {
             close();
 
         });
+
+        importe.addKeyPressListener(new ComponentEventListener<KeyPressEvent>() {
+            @Override
+            public void onComponentEvent(KeyPressEvent event) {
+                if(event.getKey().matches("Enter"))
+                    enviar.click();
+            }
+        });
+
+        concepto.addKeyPressListener(new ComponentEventListener<KeyPressEvent>() {
+            @Override
+            public void onComponentEvent(KeyPressEvent event) {
+                if(event.getKey().matches("Enter"))
+                    enviar.click();
+            }
+        });
+
+
     }
 
 
