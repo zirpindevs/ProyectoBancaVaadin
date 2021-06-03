@@ -4,6 +4,12 @@ insert into users(nif, email, password, name, last_name, number_phone, enabled, 
 insert into users(nif, email, password, name, last_name, number_phone, enabled, status, created_at) values ('12545421H', 'ned@example.com', '$2a$10$qINz45KQzkLHtzOovvgjn.y1SKh8zfR5Meyh61FHz3bvSlO4uez.O', 'Ned', 'Flandes', '325652147', true, 'pendiente', '2021-05-14 08:35:50');
 insert into users(nif, email, password, name, last_name, number_phone, enabled, status, created_at) values ('65215478S', 'juan@example.com', '$2a$10$qINz45KQzkLHtzOovvgjn.y1SKh8zfR5Meyh61FHz3bvSlO4uez.O', 'Juan', 'Fernandez García', '652325471', true, 'validado', '2021-05-14 08:35:50');
 insert into users(nif, email, password, name, last_name, number_phone, enabled, status, created_at) values ('96574852L', 'maria@example.com', '$2a$10$qINz45KQzkLHtzOovvgjn.y1SKh8zfR5Meyh61FHz3bvSlO4uez.O', 'María', 'Rivera García', '965856547', true, 'validado', '2021-05-14 08:35:50');
+insert into users(nif, email, password, name, last_name, number_phone, enabled, status, created_at) values ('1', '1@example.com', '$2y$12$AqG.5de68YxPqoaVQShXp.3/7rQ90QKlfBxMMrgvQ9VSSbBfwTpvy', '1', '2 3', '1111', true, 'validado', '2021-05-14 08:35:50');
+
+
+
+
+
 
 -- Categories examples
 insert into categories(name) values ('Ocio');
@@ -19,6 +25,8 @@ INSERT INTO bank_accounts (id, balance, created_at, deleted, enabled, num_accoun
 INSERT INTO bank_accounts (id, balance, created_at, deleted, enabled, num_account, updated_at) VALUES(4, 500.0, '2019-02-11 21:00:00.179329000', 0, 1, 'ES6763400850043966660600', NULL);
 INSERT INTO bank_accounts (id, balance, created_at, deleted, enabled, num_account, updated_at) VALUES(5, 0.0, '2021-05-24 21:40:01.479329000', 0, 1, 'ES6969715810330369060091', NULL);
 INSERT INTO bank_accounts (id, balance, created_at, deleted, enabled, num_account, updated_at) VALUES(6, 0.0, '2021-05-24 21:41:42.632885000', 1, 1, 'ES7700290200512380580842', NULL);
+-- Cuenta ImaginaBank
+INSERT INTO bank_accounts (id, balance, created_at, deleted, enabled, num_account, updated_at) VALUES(7, 100000.0, '2021-05-29 21:41:42.632885000', 0, 1, 'ES8800817399555877914763', NULL);
 
 
 
