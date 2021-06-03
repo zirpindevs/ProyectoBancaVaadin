@@ -48,7 +48,7 @@ public class PrestamoView extends Div implements HasUrlParameter<String> {
     private TextField cuentaCobro = new TextField("Cuenta de Cobro");
     private TextField tipoDeInteres = new TextField("Tipo de interes");
     private TextField cantidad = new TextField("Cantidad");
-    Select<String> duracionSelect = new Select<>();
+    private Select<String> duracionSelect = new Select<>();
 
 
 
@@ -101,7 +101,6 @@ public class PrestamoView extends Div implements HasUrlParameter<String> {
     private Component createFormLayout() {
         FormLayout formLayout = new FormLayout();
 
-        Select<String> duracionSelect = new Select<>();
         duracionSelect.setItems("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12");
         duracionSelect.setLabel("Meses de Duracion");
 
