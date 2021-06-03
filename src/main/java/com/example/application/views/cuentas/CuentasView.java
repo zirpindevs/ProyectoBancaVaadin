@@ -24,6 +24,7 @@ import com.vaadin.flow.component.html.Image;
 
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 
+import com.vaadin.flow.router.QueryParameters;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.PageTitle;
 import com.example.application.views.main.MainView;
@@ -31,6 +32,7 @@ import com.example.application.views.main.MainView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -139,7 +141,11 @@ public class CuentasView extends HorizontalLayout {
         ),
                 new Actions(
                         new ActionButton("Alta préstamo", event -> {
-                            UI.getCurrent().navigate("prestamo");
+                            Map<String, List<String>> map1 = new HashMap<>();
+                            map1.put("bankaccountId", Collections.singletonList(bankAccount.getId().toString()));
+
+                            QueryParameters queryParameters = new QueryParameters(map1);
+                            UI.getCurrent().navigate("prestamo", queryParameters);
 
                         })
 
