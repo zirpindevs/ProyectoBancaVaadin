@@ -5,6 +5,9 @@ import com.example.application.backend.payload.response.JwtResponse;
 
 import com.example.application.backend.security.service.AuthService;
 import com.example.application.backend.security.service.UserDetailsServiceImpl;
+import com.vaadin.flow.component.ClickEvent;
+import com.vaadin.flow.component.ComponentEventListener;
+import com.vaadin.flow.component.KeyPressEvent;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.formlayout.FormLayout;
@@ -42,6 +45,7 @@ public class LoginView extends VerticalLayout {
     private Button signInButton = new Button("Sign in", e ->  signIn(user));
 
 
+
     @Autowired
     AuthService authService;
 
@@ -61,6 +65,7 @@ public class LoginView extends VerticalLayout {
         logoLayout.add(new Image("/images/logo.png", ""));
         logoLayout.setClassName("logo-image");
 
+
         FormLayout logInFormLayout = new FormLayout(userNameTextField, passwordTextField, signInButton);
         VerticalLayout logInPageLayout = new VerticalLayout(logInFormLayout);
         logInFormLayout.setClassName("login-layout");
@@ -71,10 +76,28 @@ public class LoginView extends VerticalLayout {
 
         logInPageLayout.setAlignItems(Alignment.CENTER);
 
+
         // Bind the user object to text fields for reading in form inputs
         userBinder.bind(userNameTextField, User::getNif, User::setNif);
         userBinder.bind(passwordTextField, User::getPassword, User::setPassword);
         userBinder.setBean(user);
+
+
+        userNameTextField.addKeyPressListener(new ComponentEventListener<KeyPressEvent>() {
+            @Override
+            public void onComponentEvent(KeyPressEvent event) {
+                if(event.getKey().matches("Enter"))
+                    signInButton.click();
+            }
+        });
+
+        passwordTextField.addKeyPressListener(new ComponentEventListener<KeyPressEvent>() {
+            @Override
+            public void onComponentEvent(KeyPressEvent event) {
+                if(event.getKey().matches("Enter"))
+                    signInButton.click();
+            }
+        });
 
         add(logoLayout, logInPageLayout);
     }
