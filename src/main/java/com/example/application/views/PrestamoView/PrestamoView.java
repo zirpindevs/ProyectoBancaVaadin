@@ -3,11 +3,10 @@ package com.example.application.views.PrestamoView;
 import com.example.application.backend.model.BankAccount;
 import com.example.application.backend.model.TransactionDTO;
 import com.example.application.backend.repository.BankAccountRepository;
+import com.example.application.views.cuentas.PushyView;
 import com.example.application.views.cuentas.form.AccountForm;
-import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.ComponentEventListener;
-import com.vaadin.flow.component.KeyPressEvent;
-import com.vaadin.flow.component.UI;
+import com.flowingcode.vaadin.addons.simpletimer.SimpleTimer;
+import com.vaadin.flow.component.*;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
@@ -15,10 +14,12 @@ import com.vaadin.flow.component.customfield.CustomField;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
+import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.page.Push;
 import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.textfield.EmailField;
 import com.vaadin.flow.component.textfield.TextField;
@@ -29,16 +30,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.math.BigDecimal;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 
 @Route(value = "prestamo", layout = MainView.class)
 @PageTitle("Prestamo")
-public class PrestamoView extends Div implements HasUrlParameter<String> {
+public class PrestamoView extends Div implements HasUrlParameter<String>, RouterLayout {
 
     Logger logger = LoggerFactory.getLogger(this.getClass());
+    private static final int NOTIFICATION_DEFAULT_DURATION = 1000;
+
 
     private BankAccountRepository bankAccountRepository;
 
@@ -51,19 +54,18 @@ public class PrestamoView extends Div implements HasUrlParameter<String> {
     private Select<String> duracionSelect = new Select<>();
 
 
-
     private Button cancel = new Button("Cancel");
     private Button calcular = new Button("Calcular");
 
 
     public PrestamoView(BankAccountRepository bankAccountRepository) {
         super();
-        this. bankAccountRepository = bankAccountRepository;
+        this.bankAccountRepository = bankAccountRepository;
 
     }
 
-        @Override
-        public void setParameter(BeforeEvent event, @OptionalParameter String parameter) {
+    @Override
+    public void setParameter(BeforeEvent event, @OptionalParameter String parameter) {
         Location location = event.getLocation();
         QueryParameters queryParameters = location.getQueryParameters();
 
@@ -83,10 +85,11 @@ public class PrestamoView extends Div implements HasUrlParameter<String> {
         try {
             if (!optionalBankAccount.isEmpty()) {
                 this.bankAccount = optionalBankAccount.get();
-                createViewLayout();
+
+                //llamada a crear vista
+                createViewLayout2();
             }
-        }
-        catch(Exception ex) {
+        } catch (Exception ex) {
             ex.printStackTrace();
 
             logger.debug(ex.getLocalizedMessage());
@@ -114,7 +117,6 @@ public class PrestamoView extends Div implements HasUrlParameter<String> {
         cuentaCobro.setReadOnly(true);
 
 
-
         formLayout.add(cuentaIngreso, cuentaCobro, tipoDeInteres, duracionSelect, cantidad);
         return formLayout;
     }
@@ -123,7 +125,7 @@ public class PrestamoView extends Div implements HasUrlParameter<String> {
         HorizontalLayout buttonLayout = new HorizontalLayout();
         buttonLayout.addClassName("button-layout");
         calcular.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        buttonLayout.add(calcular);
+        buttonLayout.add(calculateButton());
         buttonLayout.add(cancel);
         return buttonLayout;
     }
@@ -142,17 +144,180 @@ public class PrestamoView extends Div implements HasUrlParameter<String> {
 
             // open form dialog view
             prestamoForm.open();
+
+
+
         });
 
 
         cantidad.addKeyPressListener(new ComponentEventListener<KeyPressEvent>() {
             @Override
             public void onComponentEvent(KeyPressEvent event) {
-                if(event.getKey().matches("Enter"))
+                if (event.getKey().matches("Enter"))
                     calcular.click();
             }
         });
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    private void createViewLayout2() {
+        add(createTitle());
+        add(createFormLayout());
+        add(createButtonLayout());
+
+        calcular.addClickListener(e ->
+        {
+
+            PrestamoForm prestamoForm = new PrestamoForm(bankAccount, cantidad, tipoDeInteres, duracionSelect);
+
+
+            // open form dialog view
+            prestamoForm.open();
+
+        });
+
+    }
+
+    private Button calculateButton() {
+        Button button = new Button("Previsualizar Prestamo", clickEvent -> {
+            // define form dialog
+            PrestamoForm prestamoForm = new PrestamoForm(bankAccount, cantidad, tipoDeInteres, duracionSelect);;
+
+
+            // define form dialog view callback
+            prestamoForm.addOpenedChangeListener(event -> {
+                if(!event.isOpened()) {
+                    if (prestamoForm.getDialogResult() == PrestamoForm.DIALOG_RESULT.CONFIRM)
+                        try {
+                            // save product entity
+/*
+                            prestamoForm.save(prestamoForm.getStock());
+*/
+
+                            cobrarDeudas();
+
+                        } catch (Exception ex) {
+                            logger.error(ex.getMessage());
+
+                            Notification.show(ex.getMessage(), NOTIFICATION_DEFAULT_DURATION, Notification.Position.TOP_END);
+
+                        }
+                }
+            });
+
+            // open form dialog view
+            prestamoForm.open();
+        });
+
+        return button;
+    }
+
+
+    private void cobrarDeudas() throws InterruptedException {
+/*
+        UI.getCurrent().navigate("push");
+*/
+        PushyView pushyView = new PushyView();
+/*
+        setTimeout(() -> ejecutarCobros(), 1000);
+*/
+
+    }
+
+    private void ejecutarCobros(){
+        for (int x = 0; x < 10; x++) {
+            String notificationMessage = "Cobro deuda efectuado ";
+            setTimeout(() -> System.out.println(notificationMessage), 10000);
+
+        }
+    }
+
+    //asincrona
+    public static void setTimeout(Runnable runnable, int delay){
+        new Thread(() -> {
+            try {
+                Thread.sleep(delay);
+                runnable.run();
+            }
+            catch (Exception e){
+                System.err.println(e);
+            }
+        }).start();
+    }
+
+
+
+
+    private Component mirarTiempo(){
+        SimpleTimer timer = new SimpleTimer(new BigDecimal("120"));
+        final TextField startTime =
+                new TextField("Start Time", e -> timer.setStartTime(new BigDecimal(e.getValue())));
+        timer.start();
+        return startTime;
+    }
+
+    //************************************************************************************************
+
 
 
 }
