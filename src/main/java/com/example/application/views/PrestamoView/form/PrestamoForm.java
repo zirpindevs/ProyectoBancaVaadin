@@ -1,4 +1,4 @@
-package com.example.application.views.PrestamoView;
+package com.example.application.views.PrestamoView.form;
 
 import com.example.application.backend.model.BankAccount;
 import com.example.application.backend.model.TransactionDTO;

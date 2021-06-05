@@ -1,3 +1,4 @@
+/*
 package com.example.application.views.cuentas;
 
 import com.vaadin.flow.component.AttachEvent;
@@ -20,9 +21,11 @@ public class PushyView extends Div {
 
     @Override
     public void onAttach(AttachEvent attachEvent) {
+*/
 /*
         add(new Span("Waiting for updates"));
-*/
+*//*
+
 
         // Start the data feed thread
         thread = new FeederThread(attachEvent.getUI(), this);
@@ -56,22 +59,26 @@ public class PushyView extends Div {
                     Thread.sleep(5000);
                     String message = "This is update " + count++;
 
+*/
 /*
                     ui.access(() -> view.add(new Span(message)));
-*/
+*//*
+
                     System.out.println(message);
 
                 }
 
                 // Inform that we are done
                 ui.access(() -> {
+*/
 /*
                     view.add(new Span("Done updating"));
-*/
+*//*
+
                 });
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
     }
-}
+}*/

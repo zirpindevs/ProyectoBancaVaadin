@@ -1,38 +1,28 @@
 package com.example.application.views.PrestamoView;
 
 import com.example.application.backend.model.BankAccount;
-import com.example.application.backend.model.TransactionDTO;
 import com.example.application.backend.repository.BankAccountRepository;
-import com.example.application.views.cuentas.PushyView;
-import com.example.application.views.cuentas.form.AccountForm;
+import com.example.application.backend.service.TransactionService;
+import com.example.application.views.PrestamoView.AsyncPush.AsyncPush;
+import com.example.application.views.PrestamoView.form.PrestamoForm;
 import com.flowingcode.vaadin.addons.simpletimer.SimpleTimer;
 import com.vaadin.flow.component.*;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.combobox.ComboBox;
-import com.vaadin.flow.component.customfield.CustomField;
-import com.vaadin.flow.component.datepicker.DatePicker;
-import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
-import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.page.Push;
 import com.vaadin.flow.component.select.Select;
-import com.vaadin.flow.component.textfield.EmailField;
 import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.router.*;
 import com.example.application.views.main.MainView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 
 @Route(value = "prestamo", layout = MainView.class)
@@ -42,7 +32,7 @@ public class PrestamoView extends Div implements HasUrlParameter<String>, Router
     Logger logger = LoggerFactory.getLogger(this.getClass());
     private static final int NOTIFICATION_DEFAULT_DURATION = 1000;
 
-
+    private TransactionService transactionService;
     private BankAccountRepository bankAccountRepository;
 
     private static BankAccount bankAccount;
@@ -58,9 +48,10 @@ public class PrestamoView extends Div implements HasUrlParameter<String>, Router
     private Button calcular = new Button("Calcular");
 
 
-    public PrestamoView(BankAccountRepository bankAccountRepository) {
+    public PrestamoView(BankAccountRepository bankAccountRepository, TransactionService transactionService) {
         super();
         this.bankAccountRepository = bankAccountRepository;
+        this.transactionService = transactionService;
 
     }
 
@@ -107,7 +98,7 @@ public class PrestamoView extends Div implements HasUrlParameter<String>, Router
         duracionSelect.setItems("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12");
         duracionSelect.setLabel("Meses de Duracion");
 
-        tipoDeInteres.setValue("10%");
+        tipoDeInteres.setValue("10");
         tipoDeInteres.setReadOnly(true);
 
         cuentaIngreso.setValue(this.bankAccount.getNumAccount());
@@ -241,7 +232,7 @@ public class PrestamoView extends Div implements HasUrlParameter<String>, Router
     private Button calculateButton() {
         Button button = new Button("Previsualizar Prestamo", clickEvent -> {
             // define form dialog
-            PrestamoForm prestamoForm = new PrestamoForm(bankAccount, cantidad, tipoDeInteres, duracionSelect);;
+            PrestamoForm prestamoForm = new PrestamoForm(bankAccount, cantidad, tipoDeInteres, duracionSelect);
 
 
             // define form dialog view callback
@@ -249,12 +240,12 @@ public class PrestamoView extends Div implements HasUrlParameter<String>, Router
                 if(!event.isOpened()) {
                     if (prestamoForm.getDialogResult() == PrestamoForm.DIALOG_RESULT.CONFIRM)
                         try {
-                            // save product entity
-/*
-                            prestamoForm.save(prestamoForm.getStock());
-*/
 
-                            cobrarDeudas();
+                            cantidad.setValue("1000");
+                            tipoDeInteres.setValue("10");
+                            duracionSelect.setValue("5");
+
+                            AsyncPush asyncPush = new AsyncPush(bankAccount, cantidad.getValue(), duracionSelect.getValue(), tipoDeInteres.getValue(), transactionService);
 
                         } catch (Exception ex) {
                             logger.error(ex.getMessage());
@@ -277,47 +268,10 @@ public class PrestamoView extends Div implements HasUrlParameter<String>, Router
 /*
         UI.getCurrent().navigate("push");
 */
-        PushyView pushyView = new PushyView();
-/*
-        setTimeout(() -> ejecutarCobros(), 1000);
-*/
+
+
 
     }
-
-    private void ejecutarCobros(){
-        for (int x = 0; x < 10; x++) {
-            String notificationMessage = "Cobro deuda efectuado ";
-            setTimeout(() -> System.out.println(notificationMessage), 10000);
-
-        }
-    }
-
-    //asincrona
-    public static void setTimeout(Runnable runnable, int delay){
-        new Thread(() -> {
-            try {
-                Thread.sleep(delay);
-                runnable.run();
-            }
-            catch (Exception e){
-                System.err.println(e);
-            }
-        }).start();
-    }
-
-
-
-
-    private Component mirarTiempo(){
-        SimpleTimer timer = new SimpleTimer(new BigDecimal("120"));
-        final TextField startTime =
-                new TextField("Start Time", e -> timer.setStartTime(new BigDecimal(e.getValue())));
-        timer.start();
-        return startTime;
-    }
-
-    //************************************************************************************************
-
 
 
 }
