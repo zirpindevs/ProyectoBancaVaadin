@@ -6,6 +6,8 @@ import com.example.application.backend.model.bankaccount.operations.BankAccountU
 import com.example.application.backend.repository.BankAccountRepository;
 import com.example.application.backend.security.service.UserDetailsServiceImpl;
 import com.example.application.backend.service.BankAccountService;
+import com.example.application.backend.service.TransactionService;
+import com.example.application.views.PrestamoView.AsyncPush.AsyncPush;
 import com.example.application.views.PrestamoView.form.PrestamoForm;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentEventListener;
@@ -16,6 +18,7 @@ import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H3;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.textfield.TextField;
@@ -23,22 +26,24 @@ import com.vaadin.flow.router.*;
 import com.example.application.views.main.MainView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.core.Authentication;
 
 import javax.annotation.PostConstruct;
 import java.util.*;
-import java.util.stream.Collectors;
 
 
 @Route(value = "prestamo", layout = MainView.class)
 @PageTitle("Prestamo")
-public class PrestamoView extends Div implements HasUrlParameter<String> {
+public class PrestamoView extends Div implements HasUrlParameter<String>, RouterLayout {
 
     Logger logger = LoggerFactory.getLogger(this.getClass());
+    private static final int NOTIFICATION_DEFAULT_DURATION = 1000;
 
     private UserDetailsServiceImpl userDetailsService;
     private static User userLogged;
+    private static BankAccount bankAccountCobro;
 
+
+    private TransactionService transactionService;
     private BankAccountRepository bankAccountRepository;
 
     private BankAccountService bankAccountService;
@@ -61,14 +66,12 @@ public class PrestamoView extends Div implements HasUrlParameter<String> {
     private Button calcular = new Button("Calcular");
 
 
-    public PrestamoView(BankAccountRepository bankAccountRepository, BankAccountService bankAccountService, UserDetailsServiceImpl userDetailsService) {
+    public PrestamoView(BankAccountRepository bankAccountRepository, BankAccountService bankAccountService, UserDetailsServiceImpl userDetailsService, TransactionService transactionService) {
         super();
+        this.transactionService = transactionService;
         this.bankAccountRepository = bankAccountRepository;
         this.bankAccountService = bankAccountService;
         this.userLogged = userDetailsService.getUserLogged();
-
-
-
     }
 
     @Override
@@ -88,11 +91,7 @@ public class PrestamoView extends Div implements HasUrlParameter<String> {
 
     @PostConstruct
     public void init() {
-
         this.cuentaCobro = comboBankAccount();
-
-
-
     }
 
     private void getBankaccount(Long bankaccountId) {
@@ -144,7 +143,7 @@ public class PrestamoView extends Div implements HasUrlParameter<String> {
         HorizontalLayout buttonLayout = new HorizontalLayout();
         buttonLayout.addClassName("button-layout");
         calcular.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        buttonLayout.add(calcular);
+        buttonLayout.add(calculateButton());
         buttonLayout.add(cancel);
         return buttonLayout;
     }
@@ -164,6 +163,7 @@ public class PrestamoView extends Div implements HasUrlParameter<String> {
             // open form dialog view
             prestamoForm.open();
         });
+
 
 
         cantidad.addKeyPressListener(new ComponentEventListener<KeyPressEvent>() {
@@ -208,6 +208,9 @@ public class PrestamoView extends Div implements HasUrlParameter<String> {
 
                 value.setText(event.getValue());
                 numBankAccountSelected[0] = value.getText();
+
+
+                this.bankAccountCobro = bankAccountRepository.findOneByNumAccount(value.getText()).get();
             }
 
         });
@@ -235,5 +238,44 @@ public class PrestamoView extends Div implements HasUrlParameter<String> {
         return this.bankAccountsUser;
     }
 
+
+
+
+    private Button calculateButton() {
+        Button button = new Button("Previsualizar Prestamo", clickEvent -> {
+            // define form dialog
+            PrestamoForm prestamoForm = new PrestamoForm(bankAccountCobro, cantidad, tipoDeInteres, duracionSelect);
+
+
+            // define form dialog view callback
+            prestamoForm.addOpenedChangeListener(event -> {
+                if(!event.isOpened()) {
+                    if (prestamoForm.getDialogResult() == PrestamoForm.DIALOG_RESULT.CONFIRM)
+                        try {
+/*
+                            cantidad.setValue("1000");
+*/
+                            tipoDeInteres.setValue("10");
+/*
+                            duracionSelect.setValue("5");
+*/
+
+                            AsyncPush asyncPush = new AsyncPush(bankAccountCobro, cantidad.getValue(), duracionSelect.getValue(), tipoDeInteres.getValue(), transactionService);
+
+                        } catch (Exception ex) {
+                            logger.error(ex.getMessage());
+
+                            Notification.show(ex.getMessage(), NOTIFICATION_DEFAULT_DURATION, Notification.Position.TOP_END);
+
+                        }
+                }
+            });
+
+            // open form dialog view
+            prestamoForm.open();
+        });
+
+        return button;
+    }
 
 }

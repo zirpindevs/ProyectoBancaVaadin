@@ -48,7 +48,7 @@ public class AccountForm extends Dialog {
     private TransactionService transactionService;
     private MovimientoType movimientoTransferencia = MovimientoType.TRANSFERENCIA;
 
-    private TextField  numberBankAccount = new TextField("Numbero Cuenta Origen");
+    private TextField  numberBankAccount = new TextField("Numero Cuenta Origen");
     private TextField importe = new TextField("Importe");
     private TextField concepto = new TextField("Concepto");
     private TextField tipoMovimiento = new TextField("Tipo Movimiento");
@@ -125,7 +125,7 @@ public class AccountForm extends Dialog {
         return formLayout;
     }
 
-    private Component createButtonLayout(BankAccount bankAccount) {
+    private Component createButtonLayout(BankAccount bankAccounts) {
 
         HorizontalLayout buttonLayout = new HorizontalLayout();
         buttonLayout.addClassName("transferencia-layout");
