@@ -3,7 +3,7 @@ package com.example.application.views.PrestamoView.form;
 import com.example.application.backend.model.BankAccount;
 import com.example.application.backend.model.TransactionDTO;
 import com.example.application.views.main.MainView;
-import com.flowingcode.vaadin.addons.simpletimer.SimpleTimer;
+
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
