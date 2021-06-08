@@ -1,8 +1,10 @@
 package com.example.application.views.PrestamoView.AsyncPush;
 
 import com.example.application.backend.model.BankAccount;
+import com.example.application.backend.model.Category;
 import com.example.application.backend.model.MovimientoType;
 import com.example.application.backend.model.TransactionDTO;
+import com.example.application.backend.service.CategoryService;
 import com.example.application.backend.service.TransactionService;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.page.Push;
@@ -87,7 +89,7 @@ public class AsyncPush extends Div {
 
             TransactionDTO nuevaTransaction = new TransactionDTO();
             MovimientoType movimientoTransferencia = MovimientoType.TRANSFERENCIA;
-
+            Long categoryOtros = 5L;
             String message = "Cobro Cuota numero " + count + "/" + durationAsync;
             logger.info(message);
 
@@ -100,6 +102,7 @@ public class AsyncPush extends Div {
                 nuevaTransaction.setConcepto(message);
                 nuevaTransaction.setImporte(Double.valueOf(monthlyQuota));
                 nuevaTransaction.setTipoMovimiento(movimientoTransferencia);
+                nuevaTransaction.setIdCategory(categoryOtros);
                 nuevaTransaction.setIdBankAccount(bankAccountAsync.getId());
 
                 transactionServiceAsync.createTransactionVaadin(nuevaTransaction);

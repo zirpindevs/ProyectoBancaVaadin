@@ -409,13 +409,15 @@ public class TransactionDAOImpl implements TransactionDAO {
         TransactionDTO transactionError = new TransactionDTO();
         try {
 
-            manager.createNativeQuery("INSERT INTO transactions (concepto, created_date, importe, tipo_movimiento, id_bank_account, balance_after_transaction) VALUES (?,?,?,?,?,?)")
+            manager.createNativeQuery("INSERT INTO transactions (concepto, created_date, importe, tipo_movimiento, id_bank_account, balance_after_transaction, id_category) VALUES (?,?,?,?,?,?,?)")
                     .setParameter(1, transactionDTO.getConcepto())
                     .setParameter(2, date)
                     .setParameter(3, transactionDTO.getImporte())
-                    .setParameter(4, "TRANSFERENCIA")
-                    .setParameter(5,transactionDTO.getIdBankAccount())
+                    .setParameter(4, transactionDTO.getTipoMovimiento())
+                    .setParameter(5, transactionDTO.getIdBankAccount())
                     .setParameter(6, balance_after_transaction)
+                    .setParameter(7, transactionDTO.getIdCategory())
+
 
                     .executeUpdate();
 
