@@ -19,6 +19,7 @@ import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.textfield.TextField;
@@ -54,13 +55,12 @@ public class PrestamoView extends Div implements HasUrlParameter<String>, Router
     private List<BankAccount> bankAccountsUser;
     BankAccountUserResponse bankAccountUserResponse;
 
+    // Componentes formulario
     private TextField cuentaIngreso = new TextField("Cuenta de Ingreso");
     private Component cuentaCobro = new ComboBox<String>();
-    private TextField tipoDeInteres = new TextField("Tipo de interes");
-    private TextField cantidad = new TextField("Cantidad");
+    private TextField tipoDeInteresForm = new TextField("Tipo de interes");
+    private TextField importePrestamoForm = new TextField("Cantidad");
     private Select<String> duracionSelect = new Select<>();
-
-
 
     private Button cancel = new Button("Cancel");
     private Button calcular = new Button("Calcular");
@@ -122,18 +122,13 @@ public class PrestamoView extends Div implements HasUrlParameter<String>, Router
         duracionSelect.setItems("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12");
         duracionSelect.setLabel("Meses de Duracion");
 
-        tipoDeInteres.setValue("10%");
-        tipoDeInteres.setReadOnly(true);
+        tipoDeInteresForm.setValue("10%");
+        tipoDeInteresForm.setReadOnly(true);
 
         cuentaIngreso.setValue(this.bankAccountIncome.getNumAccount());
         cuentaIngreso.setReadOnly(true);
 
-        // cuentaCobro.setValue(bankAccountRepository.findById(7L).get().getNumAccount());
-        // cuentaCobro.setReadOnly(true);
-
-
-
-        formLayout.add(cuentaIngreso, cuentaCobro, tipoDeInteres, duracionSelect, cantidad);
+        formLayout.add(cuentaIngreso, cuentaCobro, tipoDeInteresForm, duracionSelect, importePrestamoForm);
 
         return formLayout;
     }
@@ -156,7 +151,7 @@ public class PrestamoView extends Div implements HasUrlParameter<String>, Router
         calcular.addClickListener(e ->
         {
 
-            PrestamoForm prestamoForm = new PrestamoForm(bankAccountIncome, cantidad, tipoDeInteres, duracionSelect);
+            PrestamoForm prestamoForm = new PrestamoForm(bankAccountIncome, bankAccountCobro, importePrestamoForm.getValue(), tipoDeInteresForm.getValue(), duracionSelect.getValue());
 
 
             // open form dialog view
@@ -165,7 +160,7 @@ public class PrestamoView extends Div implements HasUrlParameter<String>, Router
 
 
 
-        cantidad.addKeyPressListener(new ComponentEventListener<KeyPressEvent>() {
+        importePrestamoForm.addKeyPressListener(new ComponentEventListener<KeyPressEvent>() {
             @Override
             public void onComponentEvent(KeyPressEvent event) {
                 if(event.getKey().matches("Enter"))
@@ -245,8 +240,8 @@ public class PrestamoView extends Div implements HasUrlParameter<String>, Router
     private Button calculateButton() {
         Button button = new Button("Previsualizar Prestamo", clickEvent -> {
             // define form dialog
-            PrestamoForm prestamoForm = new PrestamoForm(bankAccountCobro, cantidad, tipoDeInteres, duracionSelect);
 
+            PrestamoForm prestamoForm = new PrestamoForm(bankAccountIncome, bankAccountCobro, importePrestamoForm.getValue(), tipoDeInteresForm.getValue(), duracionSelect.getValue());
 
             // define form dialog view callback
             prestamoForm.addOpenedChangeListener(event -> {
@@ -256,14 +251,14 @@ public class PrestamoView extends Div implements HasUrlParameter<String>, Router
 /*
                             cantidad.setValue("1000");
 */
-                            tipoDeInteres.setValue("10");
+                            tipoDeInteresForm.setValue("10");
 /*
                             duracionSelect.setValue("5");
 
 */
 
-                            Double importePrestamo = Double.valueOf(cantidad.getValue());
-                            AsyncPush asyncPush = new AsyncPush(bankAccountCobro, cantidad.getValue(), duracionSelect.getValue(), tipoDeInteres.getValue(), transactionService);
+                            Double importePrestamo = Double.valueOf(importePrestamoForm.getValue());
+                            AsyncPush asyncPush = new AsyncPush(bankAccountCobro, importePrestamoForm.getValue(), duracionSelect.getValue(), tipoDeInteresForm.getValue(), transactionService);
 
                         } catch (Exception ex) {
                             logger.error(ex.getMessage());
