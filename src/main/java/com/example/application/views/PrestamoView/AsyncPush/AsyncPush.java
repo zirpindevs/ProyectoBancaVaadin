@@ -4,8 +4,6 @@ import com.example.application.backend.model.BankAccount;
 import com.example.application.backend.model.MovimientoType;
 import com.example.application.backend.model.TransactionDTO;
 import com.example.application.backend.service.TransactionService;
-import com.vaadin.flow.component.AttachEvent;
-import com.vaadin.flow.component.DetachEvent;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.page.Push;
 import com.vaadin.flow.router.Route;
@@ -18,12 +16,14 @@ import java.io.IOException;
 @Route("asyncpush")
 public class AsyncPush extends Div {
 
+    private static final int WAITING_TIME = 5000;
+
     private FeederThread thread;
-    private BankAccount bankAccountAsync;
-    private int durationAsync;
-    private double interesAsync;
-    private Double importePrestamo;
-    private TransactionService transactionServiceAsync;
+    private static BankAccount bankAccountAsync = new BankAccount();
+    private static int durationAsync = 0;
+    private static double loanRate = 0;
+    private static Double loanedMoney = null;
+    private static TransactionService transactionServiceAsync = null;
 
 
 
@@ -33,55 +33,36 @@ public class AsyncPush extends Div {
         this.transactionServiceAsync = transactionService;
         this.bankAccountAsync = bankAccount;
         this.durationAsync = Integer.parseInt(duracionSelect);
-        this.interesAsync = Double.parseDouble(tipoDeInteres);
-        this.importePrestamo = Double.valueOf(cantidad);
+        this.loanRate = Double.parseDouble(tipoDeInteres);
+        this.loanedMoney = Double.valueOf(cantidad);
 
-        thread = new FeederThread(this.bankAccountAsync, this.importePrestamo, this.durationAsync,  this.interesAsync, this.transactionServiceAsync);
-        thread.start();
-
-    }
-
-    @Override
-    public void onAttach(AttachEvent attachEvent) {
-
-        thread = new FeederThread(this.bankAccountAsync, this.importePrestamo, this.durationAsync,  this.interesAsync, this.transactionServiceAsync);
+        thread = new FeederThread();
         thread.start();
     }
 
-    @Override
-    protected void onDetach(DetachEvent detachEvent) {
-        // Cleanup
-        thread.interrupt();
-        thread = null;
-    }
+
 
     private static class FeederThread extends Thread {
         Logger logger = LoggerFactory.getLogger(this.getClass());
-
-        private TransactionService transactionServiceThread;
-
         private int count = 1;
-        BankAccount threadBankAccount;
-        private int threadDuration;
-        private double threadInteres;
-        private Double threadImportePrestamo;
-
-
-        public FeederThread(BankAccount bankAccount, Double importePrestamoAsync, int duration, Double interes, TransactionService transactionServiceAsync) {
-            this.transactionServiceThread = transactionServiceAsync;
-            this.threadBankAccount  = bankAccount;
-            this.threadImportePrestamo = importePrestamoAsync;
-            this.threadDuration = duration;
-            this.threadInteres = interes;
+        
+        public FeederThread() {
         }
 
+        /**
+         * It runs the main loop that holds the thread for A WAITING TIME between create
+         * the call createtransaction() function
+         * Counting each iteration , making the account of monthly quota to pay,
+         * insert and updating in the database tables
+         *
+         */
         @Override
         public void run() {
             try {
                 // Update the data for a while
-                while (count <= this.threadDuration) {
+                while (count <= durationAsync) {
                     // Sleep to emulate background work
-                    Thread.sleep(5000);
+                    Thread.sleep(WAITING_TIME);
 
                     createTransaction(count);
                     count++;
@@ -94,24 +75,32 @@ public class AsyncPush extends Div {
             }
         }
 
+        /**
+         * Create the Loan Transaction
+         * Counting each iteration , making the account of monthly quota to pay,
+         * insert and updating in the database tables
+         *
+         * @param count number of the transaction iteration  (int count)
+         * @return Boolean if the operation makes succesfull
+         */
         private Boolean createTransaction(int count) throws IOException {
 
             TransactionDTO nuevaTransaction = new TransactionDTO();
             MovimientoType movimientoTransferencia = MovimientoType.TRANSFERENCIA;
 
-            String message = "Cobro Prestamo numero " + count + "/" + this.threadDuration;
+            String message = "Cobro Cuota numero " + count + "/" + durationAsync;
 
-            //CALCULO CUOTA MENSUAL DE COBRO
-            Double cuotaMensual = (this.threadImportePrestamo + ( this.threadImportePrestamo / this.threadInteres)) / threadDuration;
+            //CALCULATE MONTHLY QUOTA TO PAY
+            Double monthlyQuota = (loanedMoney + ( loanedMoney / loanRate)) / durationAsync;
 
             try {
 
                 nuevaTransaction.setConcepto(message);
-                nuevaTransaction.setImporte(Double.valueOf(cuotaMensual));
+                nuevaTransaction.setImporte(Double.valueOf(monthlyQuota));
                 nuevaTransaction.setTipoMovimiento(movimientoTransferencia);
-                nuevaTransaction.setIdBankAccount(this.threadBankAccount.getId());
+                nuevaTransaction.setIdBankAccount(bankAccountAsync.getId());
 
-                this.transactionServiceThread.createTransactionVaadin(nuevaTransaction);
+                transactionServiceAsync.createTransactionVaadin(nuevaTransaction);
 
             } catch (Exception e) {
                 logger.error(e.getMessage());
