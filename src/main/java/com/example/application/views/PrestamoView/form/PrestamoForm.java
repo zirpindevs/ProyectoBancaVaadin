@@ -39,10 +39,13 @@ public class PrestamoForm extends Notification {
         private Label tipoDeInteres = new Label("Tipo de interes");
         private Label cantidad = new Label("Cantidad");*/
         private Button enviar = new Button("Enviar");
+        private Double cantidad;
 
 
     public PrestamoForm(BankAccount bankAccount, TextField cantidad, TextField tipoDeInteres, Select duracionSelect) {
         super();
+
+        this.cantidad = Double.valueOf(cantidad.getValue()) ;
 
         add(tipoDeInteres, cantidad, createToolbarLayout());
 
@@ -82,6 +85,14 @@ public class PrestamoForm extends Notification {
         formToolBar.getElement().getStyle().set("padding-top", "30px");
 
         return formToolBar;
+    }
+
+    private Double calculateMonthlyPayment(){
+        Double monthlyAmount = 0D;
+
+      //  Double totalAmount = this.threadCobro + ( this.threadCobro * this.threadInteres) / threadDuration;
+
+        return monthlyAmount;
     }
 
 

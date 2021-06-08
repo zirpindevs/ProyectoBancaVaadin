@@ -22,7 +22,7 @@ public class AsyncPush extends Div {
     private BankAccount bankAccountAsync;
     private int durationAsync;
     private double interesAsync;
-    private Long cantidadAsync;
+    private Double importePrestamo;
     private TransactionService transactionServiceAsync;
 
 
@@ -34,9 +34,9 @@ public class AsyncPush extends Div {
         this.bankAccountAsync = bankAccount;
         this.durationAsync = Integer.parseInt(duracionSelect);
         this.interesAsync = Double.parseDouble(tipoDeInteres);
-        this.cantidadAsync = Long.valueOf(cantidad);
+        this.importePrestamo = Double.valueOf(cantidad);
 
-        thread = new FeederThread(this.bankAccountAsync, this.cantidadAsync, this.durationAsync,  this.interesAsync, this.transactionServiceAsync);
+        thread = new FeederThread(this.bankAccountAsync, this.importePrestamo, this.durationAsync,  this.interesAsync, this.transactionServiceAsync);
         thread.start();
 
     }
@@ -44,7 +44,7 @@ public class AsyncPush extends Div {
     @Override
     public void onAttach(AttachEvent attachEvent) {
 
-        thread = new FeederThread(this.bankAccountAsync, this.cantidadAsync, this.durationAsync,  this.interesAsync, this.transactionServiceAsync);
+        thread = new FeederThread(this.bankAccountAsync, this.importePrestamo, this.durationAsync,  this.interesAsync, this.transactionServiceAsync);
         thread.start();
     }
 
@@ -64,13 +64,13 @@ public class AsyncPush extends Div {
         BankAccount threadBankAccount;
         private int threadDuration;
         private double threadInteres;
-        private Long threadCobro;
+        private Double threadImportePrestamo;
 
 
-        public FeederThread(BankAccount bankAccount, Long cantidadAsync, int duration, Double interes, TransactionService transactionServiceAsync) {
+        public FeederThread(BankAccount bankAccount, Double importePrestamoAsync, int duration, Double interes, TransactionService transactionServiceAsync) {
             this.transactionServiceThread = transactionServiceAsync;
             this.threadBankAccount  = bankAccount;
-            this.threadCobro = cantidadAsync;
+            this.threadImportePrestamo = importePrestamoAsync;
             this.threadDuration = duration;
             this.threadInteres = interes;
         }
@@ -101,20 +101,17 @@ public class AsyncPush extends Div {
 
             String message = "Cobro Prestamo numero " + count + "/" + this.threadDuration;
 
-            //CALCULO DE LA OPERACION DE COBRO
-            Double totalAmount = this.threadCobro + ( this.threadCobro * this.threadInteres) / threadDuration;
-
-
+            //CALCULO CUOTA MENSUAL DE COBRO
+            Double cuotaMensual = (this.threadImportePrestamo + ( this.threadImportePrestamo / this.threadInteres)) / threadDuration;
 
             try {
+
                 nuevaTransaction.setConcepto(message);
-                nuevaTransaction.setImporte(Double.valueOf(totalAmount));
+                nuevaTransaction.setImporte(Double.valueOf(cuotaMensual));
                 nuevaTransaction.setTipoMovimiento(movimientoTransferencia);
                 nuevaTransaction.setIdBankAccount(this.threadBankAccount.getId());
 
                 this.transactionServiceThread.createTransactionVaadin(nuevaTransaction);
-
-
 
             } catch (Exception e) {
                 logger.error(e.getMessage());

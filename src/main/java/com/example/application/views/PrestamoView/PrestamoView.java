@@ -134,7 +134,6 @@ public class PrestamoView extends Div implements HasUrlParameter<String>, Router
 
 
         formLayout.add(cuentaIngreso, cuentaCobro, tipoDeInteres, duracionSelect, cantidad);
-        // formLayout.add(cuentaIngreso, comboBankAccount(), tipoDeInteres, duracionSelect, cantidad);
 
         return formLayout;
     }
@@ -175,6 +174,10 @@ public class PrestamoView extends Div implements HasUrlParameter<String>, Router
         });
     }
 
+    /**
+     * Create a comboBox and load with bank accounts of the user logged
+     * @return
+     */
     private Component comboBankAccount(){
 
         final String[] numBankAccountSelected = {""};
@@ -183,8 +186,6 @@ public class PrestamoView extends Div implements HasUrlParameter<String>, Router
 
 
         Collection<String> bankAccountsCombo= new ArrayList<>();
-        //  bankAccountsCombo.add("00025145487541254");
-        //  bankAccountsCombo.add("00025145487541254");
 
         for(int x = 0; x < bankAccountsUser.size();x++) {
             bankAccountsCombo.add(bankAccountsUser.get(x).getNumAccount());
@@ -194,6 +195,7 @@ public class PrestamoView extends Div implements HasUrlParameter<String>, Router
         comboBox.setLabel("Cuenta de cobro");
         comboBox.setItems(bankAccountsCombo);
         comboBox.setValue(bankAccountsUser.get(0).getNumAccount());
+        this.bankAccountCobro = bankAccountRepository.findOneByNumAccount(bankAccountsUser.get(0).getNumAccount()).get();
 
 
         comboBox.setClearButtonVisible(true);
@@ -216,7 +218,6 @@ public class PrestamoView extends Div implements HasUrlParameter<String>, Router
         });
 
         return comboBox;
-        // add(comboBox, value);
     }
 
     /**
@@ -258,14 +259,16 @@ public class PrestamoView extends Div implements HasUrlParameter<String>, Router
                             tipoDeInteres.setValue("10");
 /*
                             duracionSelect.setValue("5");
+
 */
 
+                            Double importePrestamo = Double.valueOf(cantidad.getValue());
                             AsyncPush asyncPush = new AsyncPush(bankAccountCobro, cantidad.getValue(), duracionSelect.getValue(), tipoDeInteres.getValue(), transactionService);
 
                         } catch (Exception ex) {
                             logger.error(ex.getMessage());
 
-                            Notification.show(ex.getMessage(), NOTIFICATION_DEFAULT_DURATION, Notification.Position.TOP_END);
+                            Notification.show("Error interno, no se ha podido formalizar el préstamo", NOTIFICATION_DEFAULT_DURATION, Notification.Position.MIDDLE);
 
                         }
                 }
