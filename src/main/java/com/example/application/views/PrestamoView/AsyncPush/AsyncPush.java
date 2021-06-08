@@ -89,6 +89,8 @@ public class AsyncPush extends Div {
             MovimientoType movimientoTransferencia = MovimientoType.TRANSFERENCIA;
 
             String message = "Cobro Cuota numero " + count + "/" + durationAsync;
+            logger.info(message);
+
 
             //CALCULATE MONTHLY QUOTA TO PAY
             Double monthlyQuota = (loanedMoney + ( loanedMoney / loanRate)) / durationAsync;
