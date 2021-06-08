@@ -274,7 +274,7 @@ public class TransactionDAOImpl implements TransactionDAO {
                     .setParameter(1, transactionDTO.getConcepto())
                     .setParameter(2, date)
                     .setParameter(3, transactionDTO.getImporte())
-                    .setParameter(4, transactionDTO.getTipoMovimiento())
+                    .setParameter(4, transactionDTO.getTipoMovimiento().toString())
                     .setParameter(5, transactionDTO.getIdBankAccount())
                     .setParameter(6, balance_after_transaction)
                     .setParameter(7, transactionDTO.getIdCategory())
