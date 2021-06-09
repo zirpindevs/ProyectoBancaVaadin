@@ -143,7 +143,7 @@ public class MovimientosView extends VerticalLayout {
 
     private Image printTransactionIcon(Grid<TransactionGrid> gridTransactions, TransactionGrid transaction){
         Image icon = new Image();
-        if(transaction.getTipoMovimiento().name().equals("PAGO") || transaction.getTipoMovimiento().name().equals("RECIBO")){
+        if(transaction.getTipoMovimiento().name().equals("PAGO") || transaction.getTipoMovimiento().name().equals("RECIBO") || transaction.getTipoMovimiento().name().equals("TRANSFERENCIA_EMITIDA")){
             icon.setSrc("/images/icon-rojo.png");
         }else{
             icon.setSrc("/images/icon-verde.png");

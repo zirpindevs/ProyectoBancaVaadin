@@ -14,6 +14,7 @@ import com.example.application.views.PrestamoView.form.PrestamoForm;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.KeyPressEvent;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
@@ -268,6 +269,7 @@ public class PrestamoView extends Div implements HasUrlParameter<String>, Router
                             AsyncPush asyncPush = new AsyncPush(bankAccountCobro, importePrestamoForm.getValue(), duracionSelect.getValue(), tipoDeInteresForm.getValue(), transactionService);
 
                             Notification.show("Prestamo formalizado correctamente, se le redirigirá a la página de inicio. Las cuotas empezarán a cobrarse automáticamente cada 5 Segundos.", 5000, Notification.Position.MIDDLE);
+                            UI.getCurrent().navigate("inicio");
 
                         } catch (Exception ex) {
                             logger.error(ex.getMessage());
