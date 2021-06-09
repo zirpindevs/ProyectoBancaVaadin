@@ -1,46 +1,35 @@
 package com.example.application.views.movimientos;
 
-import com.example.application.backend.model.BankAccount;
-import com.example.application.backend.model.Transaction;
-import com.example.application.backend.model.TransactionDTO;
-import com.example.application.backend.model.TransactionGrid;
+import com.example.application.backend.model.*;
 import com.example.application.backend.model.transaction.operations.TransactionsUserResponse;
+import com.example.application.backend.security.service.UserDetailsServiceImpl;
 import com.example.application.backend.service.BankAccountService;
 import com.example.application.backend.service.TransactionService;
 import com.example.application.views.main.MainView;
-import com.github.appreciated.card.label.PrimaryLabel;
-import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Text;
-import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
-import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.Label;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.data.provider.ListDataProvider;
-import com.vaadin.flow.data.provider.Query;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.stream.Stream;
+
 
 @Route(value = "transactions", layout = MainView.class)
 @PageTitle("Movimientos")
 public class MovimientosView extends VerticalLayout {
 
-    private TransactionService transactionService;
-
-    private BankAccountService bankAccountService;
+    private static User userLogged;
 
     TransactionsUserResponse allUserTransactions;
 
@@ -50,14 +39,22 @@ public class MovimientosView extends VerticalLayout {
 
     private Grid<TransactionGrid> gridTransactions = new Grid<>(TransactionGrid.class);
 
-    private HorizontalLayout toolBarLayout;
+    Logger logger = LoggerFactory.getLogger(this.getClass());
+
+    // Services
+    private TransactionService transactionService;
+
+    private BankAccountService bankAccountService;
+
+    private UserDetailsServiceImpl userDetailsService;
 
 
 
-    public MovimientosView(TransactionService transactionService, BankAccountService bankAccountService) {
+    public MovimientosView(TransactionService transactionService, BankAccountService bankAccountService, UserDetailsServiceImpl userDetailsService) {
 
         this.transactionService = transactionService;
         this.bankAccountService = bankAccountService;
+        this.userDetailsService = userDetailsService;
 
         addClassName("transactions-view");
 
@@ -65,6 +62,9 @@ public class MovimientosView extends VerticalLayout {
         this.setHeightFull();
         this.setAlignSelf(Alignment.CENTER);
         this.setPadding(true);
+
+        // User logged data
+        this.userLogged = userDetailsService.getUserLogged();
 
         // load data from service
         loadDataAllTransactions();
@@ -88,7 +88,7 @@ public class MovimientosView extends VerticalLayout {
         map1.put("limit", "50");
 
         try {
-            this.allUserTransactions = transactionService.findAllTransactionsByDateRangeByIdUser(3L, map1);
+            this.allUserTransactions = transactionService.findAllTransactionsByDateRangeByIdUser(userLogged.getId(), map1);
             this.transactions = this.allUserTransactions.getTransactions();
 
             final int[] i = {0};
@@ -106,11 +106,13 @@ public class MovimientosView extends VerticalLayout {
 
         }
         catch(Exception e) {
-            e.printStackTrace();
-
+            logger.error(e.getMessage());
         }
     }
 
+    /**
+     * Print Grid with transactions data
+     */
     private void configureGrid() {
         loadGrid();
 
@@ -132,7 +134,7 @@ public class MovimientosView extends VerticalLayout {
                     item.getCreatedDate().toString().substring(6,7) + "/" +
                         item.getCreatedDate().toString().substring(0,4)
                 )
-        ).setFlexGrow(0).setWidth("10%").setSortable(true).setTextAlign(ColumnTextAlign.END).setHeader("Fecha");
+        ).setFlexGrow(0).setWidth("10%").setTextAlign(ColumnTextAlign.END).setHeader("Fecha");
 
         gridTransactions.addThemeVariants(GridVariant.LUMO_NO_BORDER,
                 GridVariant.LUMO_NO_ROW_BORDERS,
@@ -141,7 +143,7 @@ public class MovimientosView extends VerticalLayout {
 
     private Image printTransactionIcon(Grid<TransactionGrid> gridTransactions, TransactionGrid transaction){
         Image icon = new Image();
-        if(transaction.getTipoMovimiento().name().equals("PAGO") || transaction.getTipoMovimiento().name().equals("RECIBO")){
+        if(transaction.getTipoMovimiento().name().equals("PAGO") || transaction.getTipoMovimiento().name().equals("RECIBO") || transaction.getTipoMovimiento().name().equals("TRANSFERENCIA_EMITIDA")){
             icon.setSrc("/images/icon-rojo.png");
         }else{
             icon.setSrc("/images/icon-verde.png");
@@ -157,68 +159,16 @@ public class MovimientosView extends VerticalLayout {
 
     private void loadGrid() {
         transactionGridProvider =  DataProvider.ofCollection(this.transactions);
-        //warehouseProvider.setSortOrder(Warehouse::getName, SortDirection.ASCENDING);
 
         gridTransactions.setDataProvider(transactionGridProvider);
     }
 
     private void createViewLayout() {
 
-        Component toolbarLayout = createToolBarLayout();
-
         gridTransactions.setWidth("100%");
         gridTransactions.setHeightFull();
 
-        //add(toolbarLayout, gridTransactions);
         add(gridTransactions);
     }
-
-    private Component createToolBarLayout() {
-
-        Button buscarButton = new Button("Hola");
-
-        toolBarLayout = new HorizontalLayout();
-        toolBarLayout.setPadding(false);
-        toolBarLayout.setWidthFull();
-        //toolBarLayout.setHeight("60px");
-
-       //**********************************************************
-       /* Map<String, String> map1 = new HashMap<>();
-        map1.put("startDate", "2020-01-01 00:00:00.000000");
-        map1.put("endDate", "2022-05-31 23:59:59.999999");
-        map1.put("page", "0");
-        map1.put("limit", "50");
-
-        Div message = new Div();
-
-        ComboBox<TransactionGrid> comboBox = new ComboBox<>("Project");
-        ListDataProvider<List<TransactionGrid>> dataProvider = DataProvider
-                .ofItems(this.transactions.stream());
-               *//* .fromFilteringCallbacks(this::this.transactionService.findAllTransactionsByDateRangeByIdUser(3L, map1),
-                        15);*//*
-        comboBox.setDataProvider(dataProvider);
-        comboBox.setItemLabelGenerator(TransactionGrid::getNumCreditCard);
-
-        comboBox.addValueChangeListener(valueChangeEvent -> {
-            if (valueChangeEvent.getValue() == null) {
-                message.setText("No project selected");
-            } else {
-                message.setText(
-                        "Selected value: " + valueChangeEvent.getValue());
-            }
-        });
-
-        comboBox.addCustomValueSetListener(event -> {
-            TransactionGrid transaction = projectData.addProject(event.getDetail());
-            comboBox.setValue(transaction);
-        });
-        add(comboBox, message);*/
-        //********************************************************
-        add(buscarButton);
-
-        return toolBarLayout;
-    }
-
-
 
 }

@@ -5,8 +5,13 @@ import com.example.application.backend.payload.response.JwtResponse;
 
 import com.example.application.backend.security.service.AuthService;
 import com.example.application.backend.security.service.UserDetailsServiceImpl;
+import com.vaadin.flow.component.ClickEvent;
+import com.vaadin.flow.component.ComponentEventListener;
+import com.vaadin.flow.component.KeyPressEvent;
 import com.vaadin.flow.component.UI;
+import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.formlayout.FormLayout;
+import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -17,7 +22,6 @@ import com.vaadin.flow.router.Route;
 import com.example.application.backend.model.User;
 
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
@@ -25,12 +29,11 @@ import com.vaadin.flow.spring.annotation.UIScope;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
-
-
 @Route(value = "login")
 @PageTitle("Login")
 @UIScope
-public class LoginView extends HorizontalLayout {
+@CssImport(value = "./themes/proyectobanca/views/login/login-view.css")
+public class LoginView extends VerticalLayout {
 
     private UserDetailsServiceImpl userDetailsService;
 
@@ -40,7 +43,7 @@ public class LoginView extends HorizontalLayout {
     private TextField userNameTextField = new TextField("NIF");
     private PasswordField passwordTextField = new PasswordField("Password");
     private Button signInButton = new Button("Sign in", e ->  signIn(user));
-   // private Label newUserLabel = new Label("<span style='cursor: pointer; color:blue'>new user?</span>");
+
 
 
     @Autowired
@@ -54,28 +57,49 @@ public class LoginView extends HorizontalLayout {
 
     public LoginView(){
 
-        // Initialize and arrange layout components
-       // HorizontalLayout signUpLayout = new HorizontalLayout(newUserLabel);
-      //  FormLayout logInFormLayout = new FormLayout(userNameTextField, passwordTextField,
-      //                                              signUpLayout, signInButton);
+        this.setAlignSelf(Alignment.CENTER);
+        this.setAlignItems(Alignment.CENTER);
+        this.setClassName("principal-layout");
+
+        HorizontalLayout logoLayout = new HorizontalLayout();
+        logoLayout.add(new Image("/images/logo.png", ""));
+        logoLayout.setClassName("logo-image");
+
+
         FormLayout logInFormLayout = new FormLayout(userNameTextField, passwordTextField, signInButton);
         VerticalLayout logInPageLayout = new VerticalLayout(logInFormLayout);
+        logInFormLayout.setClassName("login-layout");
         logInFormLayout.setSizeUndefined();
-        logInPageLayout.setSizeFull();
+        logInPageLayout.setWidth("20%");
+        logInPageLayout.setAlignItems(Alignment.CENTER);
+
 
         logInPageLayout.setAlignItems(Alignment.CENTER);
-       // logInPageLayout.setComponentAlignment(logInFormLayout, Alignment.TOP_CENTER);
+
 
         // Bind the user object to text fields for reading in form inputs
         userBinder.bind(userNameTextField, User::getNif, User::setNif);
         userBinder.bind(passwordTextField, User::getPassword, User::setPassword);
         userBinder.setBean(user);
 
-        // Set up button and link
-       // signInButton.set.setClickShortcut(ShortcutAction.KeyCode.ENTER);
-        //signUpLayout.addLayoutClickListener(e -> navigator.navigateTo(org.si.simple_login.vaadin.views.SignUpView.NAME));
 
-        add(logInPageLayout);
+        userNameTextField.addKeyPressListener(new ComponentEventListener<KeyPressEvent>() {
+            @Override
+            public void onComponentEvent(KeyPressEvent event) {
+                if(event.getKey().matches("Enter"))
+                    signInButton.click();
+            }
+        });
+
+        passwordTextField.addKeyPressListener(new ComponentEventListener<KeyPressEvent>() {
+            @Override
+            public void onComponentEvent(KeyPressEvent event) {
+                if(event.getKey().matches("Enter"))
+                    signInButton.click();
+            }
+        });
+
+        add(logoLayout, logInPageLayout);
     }
 
     /**
@@ -91,15 +115,13 @@ public class LoginView extends HorizontalLayout {
         try{
             JwtResponse token = authService.authenticateUser(userLogin);
             UI.getCurrent().navigate("inicio");
-       //     SecurityConfiguration.getUserDetails().getUsername()
+
 
         }catch (Exception e){
-            e.printStackTrace();
             Notification.show("Usuario o contraseña incorrecta");
         }
 
     }
-
 
    // @Override
     public void beforeLeave (BeforeLeaveEvent event){

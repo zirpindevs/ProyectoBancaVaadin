@@ -14,7 +14,6 @@ import org.springframework.util.ObjectUtils;
 
 import java.sql.Timestamp;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -184,7 +183,9 @@ public class TransactionServiceImpl implements TransactionService {
             BankAccount bankAccount = new BankAccount();
             bankAccount = bankAccountRepository.findById(transactionDTO.getIdBankAccount()).get();
 
-            return transactionDAO.insertNewTransactionAndUpdateBalance(transactionDTO, bankAccount);
+
+
+            return transactionDAO.insertNewTransactionAndUpdateBalance(transactionDTO, currentBalanceVaadin(transactionDTO, bankAccount));
 
         } catch (Exception e) {
             log.error(e.getMessage());
@@ -222,6 +223,7 @@ public class TransactionServiceImpl implements TransactionService {
             if (transactionDTO.getIdBankAccount() != null) {
                 Optional<BankAccount> bankAccount = bankAccountRepository.findById(transactionDTO.getIdBankAccount());
                 transaction.setBankAccount(bankAccount.get());
+
             }
 
             if (transactionDTO.getIdCategory() != null) {
@@ -315,16 +317,34 @@ public class TransactionServiceImpl implements TransactionService {
     private Transaction currentBalance(Transaction transaction) {
 
 
-        if (transaction.getTipoMovimiento().equals(MovimientoType.PAGO) || transaction.getTipoMovimiento().equals(MovimientoType.RECIBO)) {
+        if (transaction.getTipoMovimiento().equals(MovimientoType.PAGO) || transaction.getTipoMovimiento().equals(MovimientoType.RECIBO) || transaction.getTipoMovimiento().equals(MovimientoType.TRANSFERENCIA_EMITIDA)) {
             transaction.getBankAccount().setBalance(transaction.getBankAccount().getBalance() - transaction.getImporte());
         }
-        if (transaction.getTipoMovimiento().equals(MovimientoType.TRANSFERENCIA) || transaction.getTipoMovimiento().equals(MovimientoType.ABONO)) {
+        if (transaction.getTipoMovimiento().equals(MovimientoType.TRANSFERENCIA_RECIBIDA) || transaction.getTipoMovimiento().equals(MovimientoType.ABONO)) {
             transaction.getBankAccount().setBalance(transaction.getBankAccount().getBalance() + transaction.getImporte());
         }
         transaction.setBalanceAfterTransaction(transaction.getBankAccount().getBalance());
 
         return transaction;
     }
+
+
+    private Double currentBalanceVaadin(TransactionDTO transaction, BankAccount bankAccount) {
+
+        Double currentBalance = 0D;
+
+        if (transaction.getTipoMovimiento().equals(MovimientoType.PAGO) || transaction.getTipoMovimiento().equals(MovimientoType.RECIBO) || transaction.getTipoMovimiento().equals(MovimientoType.TRANSFERENCIA_EMITIDA)) {
+      //      bankAccount.setBalance(transaction.getBankAccount().getBalance() - transaction.getImporte());
+            currentBalance = bankAccount.getBalance() - transaction.getImporte();
+        }
+        if (transaction.getTipoMovimiento().equals(MovimientoType.TRANSFERENCIA_RECIBIDA) || transaction.getTipoMovimiento().equals(MovimientoType.ABONO)) {
+//            transaction.getBankAccount().setBalance(transaction.getBankAccount().getBalance() + transaction.getImporte());
+            currentBalance = bankAccount.getBalance() + transaction.getImporte();
+        }
+
+        return currentBalance;
+    }
+
 
     /**
      * Check if the type of movimiento is a right field
@@ -334,8 +354,11 @@ public class TransactionServiceImpl implements TransactionService {
      */
     private Boolean ValidateTypeOfMovimiento(Enum movimientoType) {
 
-        return (movimientoType).equals(MovimientoType.PAGO) || movimientoType.equals(MovimientoType.RECIBO) || movimientoType.equals(MovimientoType.TRANSFERENCIA) || movimientoType.equals(MovimientoType.ABONO);
+        return (movimientoType).equals(MovimientoType.PAGO) || movimientoType.equals(MovimientoType.RECIBO) || movimientoType.equals(MovimientoType.TRANSFERENCIA_RECIBIDA) || movimientoType.equals(MovimientoType.ABONO);
     }
+
+
+
 
 
     /****************************************************************************************************

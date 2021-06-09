@@ -163,145 +163,6 @@ public class TransactionDAOImpl implements TransactionDAO {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    /**************************************************************************************************/
-
-
-/*    @Override
-    public List<Transaction> findTransactionByCreditCardId(Long id, Map<String, String> map1){
-*//*
-        SELECT c.*, t.* from credit_cards c INNER JOIN transactions t on c.id = t.id WHERE c.created_at >now() - interval 1 month AND c.id_user = 1
-*//*
-        try {
-            Query queryNative = manager.createNativeQuery(
-                    "SELECT * FROM transactions" +
-                            " WHERE created_date >now() - interval 1 YEAR"
-                            + " AND id_credit_card = " + id
-            );
-            List result = queryNative.getResultList();
-
-
-            return result;
-
-        }catch (Exception e){
-            log.error(e.getMessage());
-            return new ArrayList<>();
-        }
-
-    }*/
-
     @Override
     public TransactionsCreditcardResponse findAllTransactionsByDateRangeByIdCreditcard(Long idCreditcard, Map<String, String> map1) {
 
@@ -395,8 +256,8 @@ public class TransactionDAOImpl implements TransactionDAO {
 
     @Override
     @Transactional
-    public Boolean insertNewTransactionAndUpdateBalance(TransactionDTO transactionDTO, BankAccount bankAccount) {
-       Double balance_after_transaction = bankAccount.getBalance() - transactionDTO.getImporte();
+    public Boolean insertNewTransactionAndUpdateBalance(TransactionDTO transactionDTO, Double balance_after_transaction) {
+   //    Double balance_after_transaction = bankAccount.getBalance() - transactionDTO.getImporte();
 /*
         transaction.getBankAccount().setBalance(transaction.getBankAccount().getBalance() + transaction.getImporte());
 
@@ -409,13 +270,15 @@ public class TransactionDAOImpl implements TransactionDAO {
         TransactionDTO transactionError = new TransactionDTO();
         try {
 
-            manager.createNativeQuery("INSERT INTO transactions (concepto, created_date, importe, tipo_movimiento, id_bank_account, balance_after_transaction) VALUES (?,?,?,?,?,?)")
+            manager.createNativeQuery("INSERT INTO transactions (concepto, created_date, importe, tipo_movimiento, id_bank_account, balance_after_transaction, id_category) VALUES (?,?,?,?,?,?,?)")
                     .setParameter(1, transactionDTO.getConcepto())
                     .setParameter(2, date)
                     .setParameter(3, transactionDTO.getImporte())
-                    .setParameter(4, "TRANSFERENCIA")
-                    .setParameter(5,transactionDTO.getIdBankAccount())
+                    .setParameter(4, transactionDTO.getTipoMovimiento().toString())
+                    .setParameter(5, transactionDTO.getIdBankAccount())
                     .setParameter(6, balance_after_transaction)
+                    .setParameter(7, transactionDTO.getIdCategory())
+
 
                     .executeUpdate();
 

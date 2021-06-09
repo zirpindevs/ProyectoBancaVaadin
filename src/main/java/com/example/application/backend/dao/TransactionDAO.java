@@ -17,7 +17,7 @@ public interface TransactionDAO {
 
     TransactionsCreditcardResponse findAllTransactionsByDateRangeByIdCreditcard(Long idCreditcard, Map<String, String> map1);
 
-    Boolean insertNewTransactionAndUpdateBalance(TransactionDTO transactionDTO, BankAccount bankAccount);
+    Boolean insertNewTransactionAndUpdateBalance(TransactionDTO transactionDTO, Double balance_after_transaction);
 
     Object findAllBalanceAfterTransaction(Long idUser);
 
