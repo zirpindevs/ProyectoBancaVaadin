@@ -16,7 +16,6 @@ import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
-import javax.transaction.Transactional;
 import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -41,7 +40,12 @@ public class TransactionDAOImpl implements TransactionDAO {
         this.creditCardService = creditCardService;
     }
 
-
+    /**
+     * Find a transaction by id in the transaction table
+     *
+     * @param id user to search in the database
+     * @return Transaction
+     */
     @Override
     public Transaction findById(Long id){
 
@@ -60,6 +64,14 @@ public class TransactionDAOImpl implements TransactionDAO {
         return transaction;
     }
 
+
+    /**
+     * Find all transactions in a data range of a custom id user
+     *
+     * @param idUser user to search in the database
+     * @param map1 data range map
+     * @return TransactionsUserResponse
+     */
     @Override
     public TransactionsUserResponse findAllTransactionsByDateRangeByIdUser(Long idUser, Map<String, String> map1) {
 
@@ -95,6 +107,14 @@ public class TransactionDAOImpl implements TransactionDAO {
 
     }
 
+    /**
+     * Function to map the response of a creditcard findAllTransactionsByDateRangeByIdUser query
+     *
+     * @param resultDB database result
+     * @param idUser id to assign the map to a custom user
+     * @param map1 data range map
+     * @return TransactionsUserResponse
+     */
     private TransactionsUserResponse mapoutToTransactionsUserResponse(List resultDB, Long idUser, Map<String, String> map1){
 
         TransactionsUserResponse result = new TransactionsUserResponse();
@@ -129,7 +149,6 @@ public class TransactionDAOImpl implements TransactionDAO {
                 transaction.setIdBankAccount(idBankAccount.longValue());
                 String numBankAccount = this.bankAccountService.findOne(idBankAccount.longValue()).get().getNumAccount();
                 transaction.setNumBankAccount(numBankAccount);
-               // String numCuenta = bankAccount.getNumAccount();
 
                 if (((Object[]) item)[8] != null) {
                     BigInteger idCreditCard = (BigInteger) ((Object[]) item)[8];
@@ -144,11 +163,9 @@ public class TransactionDAOImpl implements TransactionDAO {
                 transaction.setIdCategory(idCategory.longValue());
 
 
-// t.last_modified, t.id_bank_account, t.id_credit_card, t.id_category
                 result.getTransactions().add(transaction);
             }
         );
-
 
 
         result.setStatus("200");
@@ -162,7 +179,13 @@ public class TransactionDAOImpl implements TransactionDAO {
     }
 
 
-
+    /**
+     * Find all transactions in a data range of a custom creditcard
+     *
+     * @param idCreditcard transaction info to create in transaction table
+     * @param map1 data range map
+     * @return Boolean if operations are succesfull
+     */
     @Override
     public TransactionsCreditcardResponse findAllTransactionsByDateRangeByIdCreditcard(Long idCreditcard, Map<String, String> map1) {
 
@@ -196,6 +219,15 @@ public class TransactionDAOImpl implements TransactionDAO {
 
     }
 
+
+    /**
+     * Function to map the response of a creditcard findAllTransactionsByDateRangeByIdCreditcard query
+     *
+     * @param resultDB database result
+     * @param idCreditcard id to assign the map to a custom creditcard
+     * @param map1 data range map
+     * @return TransactionsCreditcardResponse
+     */
     private TransactionsCreditcardResponse mapoutToTransactionsCreditcardResponse(List resultDB, Long idCreditcard, Map<String, String> map1){
 
         TransactionsCreditcardResponse result = new TransactionsCreditcardResponse();
@@ -235,9 +267,6 @@ public class TransactionDAOImpl implements TransactionDAO {
                     }
 
 
-
-
-// t.last_modified, t.id_bank_account, t.id_credit_card, t.id_category
                     result.getTransactions().add(transaction);
                 }
         );
@@ -254,16 +283,17 @@ public class TransactionDAOImpl implements TransactionDAO {
 
     }
 
+    /**
+     * Insert and update the balance of a transaction in transaction and bankaccount tables
+     * (This operation could be made in a fast repository recover call, but makes problems with vaadin-hibernate threads
+     * and this function bypass the problem)
+     *
+     * @param transactionDTO transaction info to create in transaction table
+     * @param balance_after_transaction balante to update in the bankaccount table
+     * @return Boolean if operations are succesfull
+     */
     @Override
-    @Transactional
     public Boolean insertNewTransactionAndUpdateBalance(TransactionDTO transactionDTO, Double balance_after_transaction) {
-   //    Double balance_after_transaction = bankAccount.getBalance() - transactionDTO.getImporte();
-/*
-        transaction.getBankAccount().setBalance(transaction.getBankAccount().getBalance() + transaction.getImporte());
-
-            transaction.setBalanceAfterTransaction(transaction.getBankAccount().getBalance());*/
-
-
 
         Timestamp date= Timestamp.from(Instant.now());
 
@@ -299,6 +329,13 @@ public class TransactionDAOImpl implements TransactionDAO {
 
     }
 
+    /**
+     * Recover the balance of a idUser from the database
+     *
+     * @param idUser transaction info to create in transaction table
+
+     * @return Object[] required by Apex chart funtions
+     */
     @Override
     public Object[] findAllBalanceAfterTransaction(Long idUser) {
 
