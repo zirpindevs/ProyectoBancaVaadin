@@ -71,7 +71,6 @@ public class CuentasView extends HorizontalLayout {
 
         loadDataAllTransactions();
 
-
         //pinta cada bankaccount que tenga el usuario
         bankAccounts.forEach(bankAccount -> add(cardGenerator(bankAccount)));
 
