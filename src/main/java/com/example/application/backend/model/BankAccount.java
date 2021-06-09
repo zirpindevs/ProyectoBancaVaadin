@@ -3,7 +3,6 @@ package com.example.application.backend.model;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -11,7 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Data
 @Table(name = "bank_accounts")
 public class BankAccount {
 
@@ -49,7 +47,6 @@ public class BankAccount {
 
     @ManyToMany(mappedBy = "bankAccounts")
     @JsonIgnore
-    @EqualsAndHashCode.Exclude @ToString.Exclude
     @ApiModelProperty("List of users that a bank account has: List<User>")
     private List<User> users = new ArrayList<>();
 
