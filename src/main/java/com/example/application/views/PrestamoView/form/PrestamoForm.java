@@ -1,6 +1,9 @@
 package com.example.application.views.PrestamoView.form;
 
 import com.example.application.backend.model.BankAccount;
+import com.example.application.backend.model.MovimientoType;
+import com.example.application.backend.model.TransactionDTO;
+import com.example.application.backend.service.TransactionService;
 import com.example.application.views.main.MainView;
 
 import com.vaadin.flow.component.Component;
@@ -15,6 +18,10 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import javax.annotation.PostConstruct;
+import java.io.IOException;
 
 
 @Route(value = "calculateLoan", layout = MainView.class)
@@ -22,6 +29,9 @@ import org.slf4j.LoggerFactory;
 public class PrestamoForm extends Dialog {
     private Logger logger = LoggerFactory.getLogger(this.getClass());
     public static enum DIALOG_RESULT {CONFIRM, CANCEL};
+
+    @Autowired
+    private TransactionService transactionService;
 
 
 
@@ -34,11 +44,14 @@ public class PrestamoForm extends Dialog {
         private TextField numCuotasPrestamoForm = new TextField();
         private TextField cuotaMensualPrestamoForm = new TextField();
         private Button enviar = new Button("Enviar");
+        private BankAccount bankAccountIncome;
 
 
     public PrestamoForm(BankAccount bankAccountIncome, BankAccount bankAccountCobro, String importePrestamo, String tipoDeInteres, String numCuotas) {
         super();
 
+        this.transactionService = transactionService;
+        this.bankAccountIncome = bankAccountIncome;
 
         this.bankAccountIncomeForm.setLabel("Cuenta de Ingreso");
         this.bankAccountIncomeForm.setValue(bankAccountIncome.getNumAccount());
@@ -121,27 +134,7 @@ public class PrestamoForm extends Dialog {
 
 
 
-/*
-    private Boolean createTransaction() throws IOException {
-
-        TransactionDTO nuevaTransaction = new TransactionDTO();
-        try {
-            nuevaTransaction.setConcepto(concepto.getValue());
-            nuevaTransaction.setImporte(Double.valueOf(importe.getValue()));
-            nuevaTransaction.setTipoMovimiento(movimientoTransferencia);
-            nuevaTransaction.setIdBankAccount(bankAccount.getId());
-
-            transactionService.createTransactionVaadin(nuevaTransaction);
 
 
-
-        } catch (Exception e) {
-            logger.error(e.getMessage());
-            nuevaTransaction.setId(-500L);
-            return false;
-        }
-        return true;
-    }
-    */
 
 }

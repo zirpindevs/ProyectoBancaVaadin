@@ -1,6 +1,8 @@
 package com.example.application.views.PrestamoView;
 
 import com.example.application.backend.model.BankAccount;
+import com.example.application.backend.model.MovimientoType;
+import com.example.application.backend.model.TransactionDTO;
 import com.example.application.backend.model.User;
 import com.example.application.backend.model.bankaccount.operations.BankAccountUserResponse;
 import com.example.application.backend.repository.BankAccountRepository;
@@ -29,6 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.PostConstruct;
+import java.io.IOException;
 import java.util.*;
 
 
@@ -72,6 +75,8 @@ public class PrestamoView extends Div implements HasUrlParameter<String>, Router
         this.bankAccountRepository = bankAccountRepository;
         this.bankAccountService = bankAccountService;
         this.userLogged = userDetailsService.getUserLogged();
+
+        this.duracionSelect.setValue("6");
     }
 
     @Override
@@ -257,8 +262,13 @@ public class PrestamoView extends Div implements HasUrlParameter<String>, Router
 
 */
 
+                            // Creamos el prestamo
+                            createLoan();
+
                             Double importePrestamo = Double.valueOf(importePrestamoForm.getValue());
                             AsyncPush asyncPush = new AsyncPush(bankAccountCobro, importePrestamoForm.getValue(), duracionSelect.getValue(), tipoDeInteresForm.getValue(), transactionService);
+
+                            Notification.show("Prestamo formalizado correctamente, se le redirigirá a la página de inicio. Las cuotas empezarán a cobrarse automáticamente cada 5 Segundos.", 5000, Notification.Position.MIDDLE);
 
                         } catch (Exception ex) {
                             logger.error(ex.getMessage());
@@ -274,6 +284,47 @@ public class PrestamoView extends Div implements HasUrlParameter<String>, Router
         });
 
         return button;
+    }
+
+    private Boolean createLoan() throws IOException {
+
+        TransactionDTO nuevaTransaction = new TransactionDTO();
+        MovimientoType movimientoTransferencia = MovimientoType.TRANSFERENCIA;
+        Long categoryOtros = 5L;
+        String message = "Abono préstamo";
+        logger.info(message);
+
+
+        //CALCULATE MONTHLY QUOTA TO PAY
+        Double monthlyQuota = calculateMonthlyPayment();
+
+        try {
+
+            nuevaTransaction.setConcepto(message);
+            nuevaTransaction.setImporte(Double.valueOf(this.importePrestamoForm.getValue()));
+            nuevaTransaction.setTipoMovimiento(movimientoTransferencia);
+            nuevaTransaction.setIdCategory(categoryOtros);
+            nuevaTransaction.setIdBankAccount(this.bankAccountIncome.getId());
+
+            transactionService.createTransactionVaadin(nuevaTransaction);
+
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            nuevaTransaction.setId(-500L);
+            return false;
+        }
+        return true;
+    }
+
+    private Double calculateMonthlyPayment(){
+
+        Double loanedMoney = Double.valueOf(importePrestamoForm.getValue());
+        Double loanRate = 10D;
+        Integer numCuotas = Integer.valueOf(duracionSelect.getValue());
+
+        Double monthlyQuota = (loanedMoney + ( loanedMoney / loanRate)) / numCuotas;
+
+        return monthlyQuota;
     }
 
 }
