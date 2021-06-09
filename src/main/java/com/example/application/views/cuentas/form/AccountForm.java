@@ -9,33 +9,19 @@ import com.vaadin.flow.component.KeyPressEvent;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.List;
 
 @Route(value = "account", layout = MainView.class)
 @PageTitle("Account")
@@ -46,7 +32,7 @@ public class AccountForm extends Dialog {
     private BankAccount bankAccount;
     private Transaction transaction;
     private TransactionService transactionService;
-    private MovimientoType movimientoTransferencia = MovimientoType.TRANSFERENCIA;
+    private MovimientoType movimientoTransferencia = MovimientoType.TRANSFERENCIA_EMITIDA;
 
     private TextField  numberBankAccount = new TextField("Numero Cuenta Origen");
     private TextField importe = new TextField("Importe");
@@ -149,6 +135,7 @@ public class AccountForm extends Dialog {
         return buttonLayout;
     }
 
+    @Transactional
     private Boolean createTransaction() throws IOException {
 
         TransactionDTO nuevaTransaction = new TransactionDTO();
@@ -158,7 +145,7 @@ public class AccountForm extends Dialog {
             nuevaTransaction.setTipoMovimiento(movimientoTransferencia);
             nuevaTransaction.setIdBankAccount(bankAccount.getId());
 
-            transactionService.createTransactionVaadin(nuevaTransaction);
+            transactionService.createTransactionForm(nuevaTransaction);
 
 
 

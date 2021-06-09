@@ -256,8 +256,8 @@ public class TransactionDAOImpl implements TransactionDAO {
 
     @Override
     @Transactional
-    public Boolean insertNewTransactionAndUpdateBalance(TransactionDTO transactionDTO, BankAccount bankAccount) {
-       Double balance_after_transaction = bankAccount.getBalance() - transactionDTO.getImporte();
+    public Boolean insertNewTransactionAndUpdateBalance(TransactionDTO transactionDTO, Double balance_after_transaction) {
+   //    Double balance_after_transaction = bankAccount.getBalance() - transactionDTO.getImporte();
 /*
         transaction.getBankAccount().setBalance(transaction.getBankAccount().getBalance() + transaction.getImporte());
 

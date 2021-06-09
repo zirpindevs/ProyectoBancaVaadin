@@ -30,10 +30,6 @@ public class PrestamoForm extends Dialog {
     private Logger logger = LoggerFactory.getLogger(this.getClass());
     public static enum DIALOG_RESULT {CONFIRM, CANCEL};
 
-    @Autowired
-    private TransactionService transactionService;
-
-
 
     private DIALOG_RESULT dialogResult;
 
@@ -50,7 +46,6 @@ public class PrestamoForm extends Dialog {
     public PrestamoForm(BankAccount bankAccountIncome, BankAccount bankAccountCobro, String importePrestamo, String tipoDeInteres, String numCuotas) {
         super();
 
-        this.transactionService = transactionService;
         this.bankAccountIncome = bankAccountIncome;
 
         this.bankAccountIncomeForm.setLabel("Cuenta de Ingreso");
