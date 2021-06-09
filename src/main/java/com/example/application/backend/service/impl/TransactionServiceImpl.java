@@ -162,27 +162,19 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     /**
-     * Create a new transaction in database - Service
+     * Create a new transaction for vaadin calls in database - Service
      *
      * @param transactionDTO to update
-     * @return Transaction created in database
+     * @return Boolean of operation status
      */
     @Override
     public Boolean createTransactionVaadin(TransactionDTO transactionDTO) {
         log.debug("Create Transaction: {}", transactionDTO);
 
-/*
-        Transaction transactionValidated = createValidateTransaction(transactionDTO);
-*/
-
         try {
-
-         /*   transactionValidated.setCreatedDate(Timestamp.from(Instant.now()));
-            transactionValidated.setLastModified(Instant.now());*/
 
             BankAccount bankAccount = new BankAccount();
             bankAccount = bankAccountRepository.findById(transactionDTO.getIdBankAccount()).get();
-
 
 
             return transactionDAO.insertNewTransactionAndUpdateBalance(transactionDTO, currentBalanceVaadin(transactionDTO, bankAccount));
@@ -309,8 +301,11 @@ public class TransactionServiceImpl implements TransactionService {
 
 
     /**
-     * Set the current balance in the BankAccounts and Transaction before an operation
-     *
+     * Set the current balance in the BankAccounts and Transaction after an operation transactions calls
+     * depending of the movimientoType, it operates with different sign
+     * setting positive balante TRANSFERENCIA_RECIBIDA AND ABONO
+     * setting negative balante PAGO,RECIBO AND TRANSFERENCIA_EMITIDA
+     *     *
      * @param transaction
      * @return Transaction
      */
@@ -329,17 +324,26 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
 
-    private Double currentBalanceVaadin(TransactionDTO transaction, BankAccount bankAccount) {
+
+    /**
+     * Set the current balance in the BankAccounts and Transaction after an operation for Vaadin create transactions calls
+     * depending of the movimientoType, it operates with different sign
+     * setting positive balante TRANSFERENCIA_RECIBIDA AND ABONO
+     * setting negative balante PAGO,RECIBO AND TRANSFERENCIA_EMITIDA
+     *
+     * @param transactionDTO
+     * @param bankAccount
+     * @return Double currentBalance
+     */
+    private Double currentBalanceVaadin(TransactionDTO transactionDTO, BankAccount bankAccount) {
 
         Double currentBalance = 0D;
 
-        if (transaction.getTipoMovimiento().equals(MovimientoType.PAGO) || transaction.getTipoMovimiento().equals(MovimientoType.RECIBO) || transaction.getTipoMovimiento().equals(MovimientoType.TRANSFERENCIA_EMITIDA)) {
-      //      bankAccount.setBalance(transaction.getBankAccount().getBalance() - transaction.getImporte());
-            currentBalance = bankAccount.getBalance() - transaction.getImporte();
+        if (transactionDTO.getTipoMovimiento().equals(MovimientoType.PAGO) || transactionDTO.getTipoMovimiento().equals(MovimientoType.RECIBO) || transactionDTO.getTipoMovimiento().equals(MovimientoType.TRANSFERENCIA_EMITIDA)) {
+            currentBalance = bankAccount.getBalance() - transactionDTO.getImporte();
         }
-        if (transaction.getTipoMovimiento().equals(MovimientoType.TRANSFERENCIA_RECIBIDA) || transaction.getTipoMovimiento().equals(MovimientoType.ABONO)) {
-//            transaction.getBankAccount().setBalance(transaction.getBankAccount().getBalance() + transaction.getImporte());
-            currentBalance = bankAccount.getBalance() + transaction.getImporte();
+        if (transactionDTO.getTipoMovimiento().equals(MovimientoType.TRANSFERENCIA_RECIBIDA) || transactionDTO.getTipoMovimiento().equals(MovimientoType.ABONO)) {
+            currentBalance = bankAccount.getBalance() + transactionDTO.getImporte();
         }
 
         return currentBalance;
@@ -358,23 +362,12 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
 
-
-
-
-    /****************************************************************************************************
-     *
-     *
-     *
-     *
-     *
-     */
-
-
     /**
-     * Get transactions by creditcard ID - Service
+     * Get transactions by creditcard ID in a data range - Service
      *
      * @param idCreditcard id creditcard id of transactions : Long
-     * @return List<Transaction> from database
+     * @param map1 datarange
+     * @return TransactionsCreditcardResponse
      */
     @Override
     public TransactionsCreditcardResponse findAllTransactionsByDateRangeByIdCreditcard(Long idCreditcard, Map<String, String> map1) {
@@ -394,10 +387,10 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     /**
-     * Get balance after transaction  by User ID - Service
+     * Get balance after transaction by User ID - Service
      *
      * @param idUser id user id of transactions : Long
-     * @returnObject[] from database format to a chart
+     * @returnObject[] from database format to a Apexchart
      */
     @Override
     public Object[] findAllBalanceAfterTransaction(Long idUser) {
