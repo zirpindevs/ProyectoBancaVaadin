@@ -134,7 +134,12 @@ public class CuentasView extends HorizontalLayout {
                 ),
                 new Actions(
                         new ActionButton("Consultar Movimientos", event -> {
-                            UI.getCurrent().navigate("transactions");
+                            //UI.getCurrent().navigate("transactions");
+                            Map<String, List<String>> map1 = new HashMap<>();
+                            map1.put("bankaccountId", Collections.singletonList(bankAccount.getId().toString()));
+
+                            QueryParameters queryParameters = new QueryParameters(map1);
+                            UI.getCurrent().navigate("movimientosCustom", queryParameters);
 
                         })
 

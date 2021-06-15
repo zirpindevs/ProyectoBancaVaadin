@@ -2,6 +2,7 @@ package com.example.application.backend.service;
 
 import com.example.application.backend.model.Transaction;
 import com.example.application.backend.model.TransactionDTO;
+import com.example.application.backend.model.transaction.operations.TransactionsBankAccountResponse;
 import com.example.application.backend.model.transaction.operations.TransactionsCreditcardResponse;
 import com.example.application.backend.model.transaction.operations.TransactionsUserResponse;
 import com.example.application.backend.model.transaction.operations.idbankaccountTransactions.TransactionsByBankAccountResponse;
@@ -15,7 +16,7 @@ public interface TransactionService {
 
     Transaction findOne(Long id);
 
-    TransactionsByBankAccountResponse findAllTransactionsByDateRangeByIdBankAccount(Long idBankAccount, Map<String, String> map1);
+    TransactionsBankAccountResponse findAllTransactionsByDateRangeByIdBankAccount(Long idBankAccount, Map<String, String> map1);
 
     TransactionsUserResponse findAllTransactionsByDateRangeByIdUser(Long idUser, Map<String, String> map1);
 
@@ -34,7 +35,6 @@ public interface TransactionService {
     Boolean createTransactionVaadin(TransactionDTO transactionDTO);
 
     Object[] findAllBalanceAfterTransaction(Long idUser);
-
 
 
     }

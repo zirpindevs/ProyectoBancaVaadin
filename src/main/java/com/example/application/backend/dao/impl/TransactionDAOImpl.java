@@ -2,8 +2,10 @@ package com.example.application.backend.dao.impl;
 
 import com.example.application.backend.dao.TransactionDAO;
 import com.example.application.backend.model.*;
+import com.example.application.backend.model.transaction.operations.TransactionsBankAccountResponse;
 import com.example.application.backend.model.transaction.operations.TransactionsCreditcardResponse;
 import com.example.application.backend.model.transaction.operations.TransactionsUserResponse;
+import com.example.application.backend.model.transaction.operations.idbankaccountTransactions.TransactionsByBankAccountResponse;
 import com.example.application.backend.service.BankAccountService;
 import com.example.application.backend.service.CreditCardService;
 import org.slf4j.Logger;
@@ -178,6 +180,108 @@ public class TransactionDAOImpl implements TransactionDAO {
 
     }
 
+    /**
+     * Find all transactions in a data range of a custom bankaccount
+     *
+     * @param idBankaccount transaction info to create in bankaccount table
+     * @param map1 data range map
+     * @return Boolean if operations are succesfull
+     */
+    @Override
+    public TransactionsBankAccountResponse findAllTransactionsByDateRangeByIdBankAccount(Long idBankaccount, Map<String, String> map1) {
+
+        try {
+
+            Query queryNative = manager.createNativeQuery(
+                    "SELECT * " +
+                            "FROM transactions " +
+                            "WHERE created_date BETWEEN '"
+                            + map1.get("startDate") + "'"
+                            + " AND '" + map1.get("endDate") + "'"
+                            + " AND id_bank_account = " + idBankaccount
+            );
+
+            List resultDB = queryNative.getResultList();
+
+            if (resultDB.size() == 0)
+                return new TransactionsBankAccountResponse("-204");
+
+            TransactionsBankAccountResponse result = mapoutToTransactionsBankaccountResponse(resultDB, idBankaccount, map1);
+
+
+            return result;
+
+
+        }catch (Exception e){
+            log.error(e.getMessage());
+            return new TransactionsBankAccountResponse("-500");
+        }
+
+
+    }
+
+    /**
+     * Function to map the response of a bankaccount findAllTransactionsByDateRangeByidBankaccount query
+     *
+     * @param resultDB database result
+     * @param idBankaccount id to assign the map to a custom Bankaccount
+     * @param map1 data range map
+     * @return TransactionsByBankAccountResponse
+     */
+    private TransactionsBankAccountResponse mapoutToTransactionsBankaccountResponse(List resultDB, Long idBankaccount, Map<String, String> map1){
+
+        TransactionsBankAccountResponse result = new TransactionsBankAccountResponse();
+
+        resultDB.forEach(
+                item -> {
+                    TransactionGrid transaction = new TransactionGrid();
+
+                    BigInteger idTransaction = (BigInteger) ((Object[]) item)[0];
+
+                    transaction.setId( idTransaction.longValue() );
+
+                    transaction.setBalanceAfterTransaction( (Double) ((Object[]) item)[1] );
+
+                    transaction.setConcepto( (String) ((Object[]) item)[2].toString() );
+
+                    Timestamp createdDate = (Timestamp) ((Object[]) item)[3];
+                    transaction.setCreatedDate(createdDate.toInstant());
+
+                    transaction.setImporte( (Double) ((Object[]) item)[4] );
+
+                    if (((Object[]) item)[5] != null) {
+                        Timestamp lasModified = (Timestamp) ((Object[]) item)[5];
+                        transaction.setLastModified(lasModified.toInstant());
+                    }
+
+                    String tipoMovimiento = (String) ((Object[]) item)[6].toString();
+                    transaction.setTipoMovimiento( MovimientoType.valueOf(tipoMovimiento) );
+
+
+                    BigInteger idBankAccount = (BigInteger) ((Object[]) item)[7];
+                    transaction.setIdBankAccount(idBankAccount.longValue());
+
+                    if (((Object[]) item)[9] != null) {
+                        BigInteger idCreditCard = (BigInteger) ((Object[]) item)[9];
+                        transaction.setIdCreditCard(idCreditCard.longValue());
+                    }
+
+
+                    result.getTransactions().add(transaction);
+                }
+        );
+
+
+
+        result.setStatus("200");
+        result.setIdUser(idBankaccount);
+        result.setStartDate(map1.get("startDate"));
+        result.setEndDate(map1.get("endDate"));
+
+
+        return result;
+
+    }
 
     /**
      * Find all transactions in a data range of a custom creditcard
