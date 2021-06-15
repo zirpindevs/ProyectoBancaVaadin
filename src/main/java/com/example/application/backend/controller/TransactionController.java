@@ -2,6 +2,7 @@ package com.example.application.backend.controller;
 
 import com.example.application.backend.model.Transaction;
 import com.example.application.backend.model.TransactionDTO;
+import com.example.application.backend.model.transaction.operations.TransactionsBankAccountResponse;
 import com.example.application.backend.model.transaction.operations.TransactionsCreditcardResponse;
 import com.example.application.backend.model.transaction.operations.TransactionsUserResponse;
 import com.example.application.backend.model.transaction.operations.UserDailyBalanceResponse;
@@ -84,7 +85,7 @@ public class TransactionController {
      */
     @GetMapping("/transactions/bankaccount/{idBankAccount}")
     @ApiOperation("Get Balance and Total of Transactions per day between two dates")
-    public ResponseEntity<TransactionsByBankAccountResponse> findAllTransactionsByDateRangeByIdBankAccount(
+    public ResponseEntity<TransactionsBankAccountResponse> findAllTransactionsByDateRangeByIdBankAccount(
             @ApiParam("Primary key of the user: Long") @PathVariable Long idBankAccount,
             @ApiParam("Start date: LocalDate") @QueryParam("startDate") String startDate,
             @ApiParam("End date: LocalDate") @QueryParam("endDate") String endDate,
@@ -101,7 +102,7 @@ public class TransactionController {
         if (startDate == null || endDate == null)
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
-        TransactionsByBankAccountResponse result = transactionService.findAllTransactionsByDateRangeByIdBankAccount(idBankAccount, map1);
+        TransactionsBankAccountResponse result = transactionService.findAllTransactionsByDateRangeByIdBankAccount(idBankAccount, map1);
 
         if (result.getStatus() == "-404")
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
